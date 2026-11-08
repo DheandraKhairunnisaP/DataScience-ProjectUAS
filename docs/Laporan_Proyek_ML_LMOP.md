@@ -1,18 +1,19 @@
 ## INFORMASI PROYEK
 
-**Judul Proyek:**  
-[(Contoh: "Klasifikasi Penyakit Daun Menggunakan CNN", "Prediksi Harga Rumah dengan Machine Learning", "Analisis Sentimen Ulasan Produk")]
+**Judul Proyek:**  Fusi Data Penginderaan Jauh dan Parameter Cuaca In Situ untuk Prediksi Kerentanan Pangan Terhadap Anomali Iklim
 
-**Nama Mahasiswa:** [Nama Lengkap]  
-**NIM:** [Nomor Induk Mahasiswa]  
-**Program Studi:** [Teknologi Informasi / Rekayasa Perangkat Lunak]  
-**Mata Kuliah:** [Nama Mata Kuliah]  
-**Dosen Pengampu:** [Nama Dosen]  
-**Tahun Akademik:** [Tahun/Semester]  
-**Link GitHub Repository:** [URL Repository]  
+**Nama Mahasiswa:** 
+- Dheandra Khairunnisa Pambudi 
+- Dzakwan Daris Fakhruddin 
+**NIM:** 244311009 & 244311011  
+**Program Studi:** Teknologi Rekayasa Perangkat Lunak  
+**Mata Kuliah:** Data Science
+**Dosen Pengampu:** Gus Nanang Syaifuddiin, S.Kom., M.Kom.  
+**Tahun Akademik:** 2026, Semester 5
+**Link GitHub Repository:** (https://github.com/DheandraKhairunnisaP/DataScience-ProjectUAS.git)  
 **Link Video Pembahasan:** [URL Video (YouTube/Drive)]  
-**SDG yang Dipilih:** [Nomor & nama Goal, misal: SDG 3 – Kehidupan Sehat dan Sejahtera]  
-**Target SDG yang Relevan:** [misal: Target 3.4 – mengurangi kematian dini akibat penyakit tidak menular]
+**SDG yang Dipilih:** Goal 2 Zero Hunger dengan , didukung oleh Goal 13 Climate Action  
+**Target SDG yang Relevan:** *Goal 2 Zero Hunger* Target untuk menjamin sistem produksi pangan yang berkelanjutan dan memperkuat kapasitas adaptasi terhadap perubahan iklim serta cuaca ekstrem dan *Goal 13 Climate Action* khususnya target terkait penguatan ketahanan terhadap bahaya bencana iklim. 
 
 ---
 
