@@ -4,7 +4,8 @@
 
 **Nama Mahasiswa:** 
 - Dheandra Khairunnisa Pambudi 
-- Dzakwan Daris Fakhruddin 
+- Dzakwan Daris Fakhruddin
+
 **NIM:** 244311009 & 244311011  
 **Program Studi:** Teknologi Rekayasa Perangkat Lunak  
 **Mata Kuliah:** Data Science
