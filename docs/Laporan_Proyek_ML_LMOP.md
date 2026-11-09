@@ -1,20 +1,16 @@
 ## INFORMASI PROYEK
 
-**Judul Proyek:**  Fusi Data Penginderaan Jauh dan Parameter Cuaca In Situ untuk Prediksi Kerentanan Pangan Terhadap Anomali Iklim
-
-**Nama Mahasiswa:** 
-- Dheandra Khairunnisa Pambudi 
-- Dzakwan Daris Fakhruddin
-
-**NIM:** 244311009 & 244311011  
-**Program Studi:** Teknologi Rekayasa Perangkat Lunak  
-**Mata Kuliah:** Data Science
-**Dosen Pengampu:** Gus Nanang Syaifuddiin, S.Kom., M.Kom.  
-**Tahun Akademik:** 2026, Semester 5
-**Link GitHub Repository:** (https://github.com/DheandraKhairunnisaP/DataScience-ProjectUAS.git)  
-**Link Video Pembahasan:** [URL Video (YouTube/Drive)]  
-**SDG yang Dipilih:** Goal 2 Zero Hunger dengan , didukung oleh Goal 13 Climate Action  
-**Target SDG yang Relevan:** 
+- **Judul Proyek:**  Fusi Data Penginderaan Jauh dan Parameter Cuaca In Situ untuk Prediksi Kerentanan Pangan Terhadap Anomali Iklim
+- **Nama Mahasiswa:** Dheandra Khairunnisa Pambudi & Dzakwan Daris Fakhruddin
+- **NIM:** 244311009 & 244311011
+- **Program Studi:** Teknologi Rekayasa Perangkat Lunak
+- **Mata Kuliah:** Data Science
+- **Dosen Pengampu:** Gus Nanang Syaifuddiin, S.Kom., M.Kom.
+- **Tahun Akademik:** 2026, Semester 5
+- **Link GitHub Repository:** (https://github.com/DheandraKhairunnisaP/DataScience-ProjectUAS.git)
+- **Link Video Pembahasan:** [URL Video (YouTube/Drive)]
+- **SDG yang Dipilih:** Goal 2 Zero Hunger dengan , didukung oleh Goal 13 Climate Action
+- **Target SDG yang Relevan:** Target 2.4 (Pertanian Berkelanjutan) dan Target 13.1 (Ketahanan terhadap Dampak Perubahan Iklim).
 
 ---
 
@@ -24,8 +20,8 @@ Laporan ini disusun mengikuti **ML Lifecycle** yang terdiri dari empat tahap ber
 
 | Tahap | Singkatan | Inti Pertanyaan | Bagian Laporan |
 |-------|-----------|-----------------|----------------|
-| **Learning Problem** | **L** | Merusmuskan masalah prediksi hasil panen komoditas pangan menggunakan variabel iklim dan penggunaan pestisida. Target prediksi ini berupa nilai hasil panen dalam satuan hektogram per hektar(hg/ha) | Bab 2, 3, 4, 5 |
-| **Model Design** | **M** | Merancang tiga model Regresi, yaitu Linear Rgression sebagai baseline, Random Forest Rgressor sebagai model Machine Learning lanjutan, dan Multilayer Perceptron (MLP) sebagai model Deep Learning| Bab 6 (6.x.1 – 6.x.3) |
+| **Learning Problem** | **L** | Merumuskan masalah prediksi hasil panen komoditas pangan menggunakan variabel iklim dan penggunaan pestisida. Target prediksi ini berupa nilai hasil panen dalam satuan hektogram per hektar(hg/ha) | Bab 2, 3, 4, 5 |
+| **Model Design** | **M** | Merancang tiga model Regresi, yaitu Linear Rgression sebagai baseline, Random Forest Regressor sebagai model Machine Learning lanjutan, dan Multilayer Perceptron (MLP) sebagai model Deep Learning | Bab 6 (6.x.1 – 6.x.3) |
 | **Optimization** | **O** | Melakukan pelatihan dan optimasi model menggunakan fungsi loss MSE, optimizer yang sesuai, hyperparameter tuning, serta regularisasi untuk mengurangi overfitting. | Bab 6 (6.x.4 – 6.x.6) |
 | **Predict & Evaluate** | **P** | Menghasilkan prediksi hasil panen dan mengevaluasi performa setiap model menggunakan RMSE, MAE, dan R² untuk menentukan model terbaik. | Bab 7 |
 
@@ -59,11 +55,11 @@ Pada proyek ini, mahasiswa diharapkan dapat:
 ## 2. PROJECT OVERVIEW  **[L]**
 
 ### 2.1 Latar Belakang
-**Isi bagian ini dengan:** Sektor pertanian memiliki peran penting dalam memenuhi kebutuhan pada masyarakat. Namun, produktivitas hasil panen dapat dipengaruhi oleh berbagai faktor, seperti perubahan suhu, curah hujan, jenis tanaman, dan penguunaan input pertanian. Menurut Van Klompenburg, Kassahun, dan Catal (2020) dalam penelitian *Crop Yield Precdiction Uasing Machine Learning: A Systematic Literature Revuew*, suhu, curuah hujan, dan jenis tanah merupakan beberapa variabel yang sering digunakan dalam penelitian prediksi hasil panen.
+**Isi bagian ini dengan:** Sektor pertanian memiliki peran penting dalam memenuhi kebutuhan pada masyarakat. Namun, produktivitas hasil panen dapat dipengaruhi oleh berbagai faktor, seperti perubahan suhu, curah hujan, jenis tanaman, dan penguunaan input pertanian. Menurut Van Klompenburg, Kassahun, dan Catal (2020) dalam penelitian *Crop Yield Precdiction Uasing Machine Learning: A Systematic Literature Revuew*, suhu, curah hujan, dan jenis tanah merupakan beberapa variabel yang sering digunakan dalam penelitian prediksi hasil panen.
 
-   Salah satu pendekatan yang dapat digunakan adalah Mechine Learning, yaitu dengan memanfaatkan data hstoris untuk mempelajari hubungan antara faktor-faktor pertanian dan hasil panen. Penelitian Khaki dan Wang (2019) melalui *Crap Yield Prediction Using Deep Neural Networks* menunjukkan bahwwa pendekatan Deep Neural Networj mampu mempelajari hubungan jompleks antara faktor lingkungan dan hasil panen serta memberikan hasil prediksi yang lebih baik dibandingkan beberapa model pembanding dalam penelitian mereka tersebut.
+   Salah satu pendekatan yang dapat digunakan adalah Mechine Learning, yaitu dengan memanfaatkan data historis untuk mempelajari hubungan antara faktor-faktor pertanian dan hasil panen. Penelitian Khaki dan Wang (2019) melalui *Crap Yield Prediction Using Deep Neural Networks* menunjukkan bahwwa pendekatan Deep Neural Network mampu mempelajari hubungan kompleks antara faktor lingkungan dan hasil panen serta memberikan hasil prediksi yang lebih baik dibandingkan beberapa model pembanding dalam penelitian mereka tersebut.
 
-   Dengan hal itu, proyek ini memiliki tujuan untuk mengembangkan dan membandungkan tiga model, yaitu Linear Regression, Random Forest Regressor, dan Multilayer Perceptron (MLP), untuk memprediksi hasil panen komoditas pangan. Dataset utama terdiri atas 28.242 observasi dari 101 negara dan 10 jenis tanaman pada periode 1990–2013, dengan variabel tahun, jenis tanaman, wilayah negara, suhu rata-rata, curah hujan rata-rata, dan penggunaan pestisida. Hasil penelitian diharapkan dapat menjadi informasi pendukung dalam analisis produktivitas pertanian dan perencanaan pangan, serta mendukung SDG 2 (Tanpa Kelaparan) dan SDG 13 (Penanganan Perubahan Iklim).
+   Dengan hal itu, proyek ini memiliki tujuan untuk mengembangkan dan membandingkan tiga model, yaitu Linear Regression, Random Forest Regressor, dan Multilayer Perceptron (MLP), untuk memprediksi hasil panen komoditas pangan. Dataset utama terdiri atas 28.242 observasi dari 101 negara dan 10 jenis tanaman pada periode 1990–2013, dengan variabel tahun, jenis tanaman, wilayah negara, suhu rata-rata, curah hujan rata-rata, dan penggunaan pestisida. Hasil penelitian diharapkan dapat menjadi informasi pendukung dalam analisis produktivitas pertanian dan perencanaan pangan, serta mendukung SDG 2 (Tanpa Kelaparan) dan SDG 13 (Penanganan Perubahan Iklim).
 
 **[Jelaskan konteks dan latar belakang proyek]**
 
@@ -91,7 +87,7 @@ Jelaskan dalam 1 paragraf pendek bagaimana proyek Anda melewati tahap L → M �
 
 Proyek ini dimulai dari tahap *Learning Problem [L]* yang merupakan tahapan mengindentifikasi permasalahan prediksi hasil panen dan menentukan variabel yang digunakan, dengan hasil panen dalam satuan hg/ha sebagai target prediksi. Selanjutnya, pada tahap *Model Design [M]*, dirancang tiga model regresi yang terdiri atas Linear Regression, Random Forest Regressor, dan Multilayer Perceptron (MLP). 
 
-Pada tahap *Optimization [O], dari masing-masing model dilatih dengan konfigurasi parameter yang sesuai, mengguanakan MSE sebagai fungsi kerugian dan melakukan hyperparameter tuning serta regularisasi pada model yang memerlukannya. Tahap terakhir yaitu *Predict & Evaluate [P]* itu merupakan pengukuran performa model menggunakan RMSE, MAE, R². Hasil evaluasi digunakan untuk membandingkan ketiga model dan menentukan model terbaik. Apabila hasil prediksi belum optimal, proses akan diulang dengan memperbaiki prepprocessing, pemilihan fitur, rancangan model, atau parameter pelatihan.
+Pada tahap *Optimization [O]*, dari masing-masing model dilatih dengan konfigurasi parameter yang sesuai, mengguanakan MSE sebagai fungsi kerugian dan melakukan hyperparameter tuning serta regularisasi pada model yang memerlukannya. Tahap terakhir yaitu *Predict & Evaluate [P]* itu merupakan pengukuran performa model menggunakan RMSE, MAE, R². Hasil evaluasi digunakan untuk membandingkan ketiga model dan menentukan model terbaik. Apabila hasil prediksi belum optimal, proses akan diulang dengan memperbaiki prepprocessing, pemilihan fitur, rancangan model, atau parameter pelatihan.
 
 ## 3. BUSINESS UNDERSTANDING / PROBLEM UNDERSTANDING  **[L]**
 
@@ -107,9 +103,9 @@ Tuliskan 2–4 pernyataan masalah yang jelas dan spesifik.
 **[Tulis problem statements Anda di sini]**
 
 1. Hasil panen komoditas pangan memiliki variasi berdasarkan jenis tanaman, wilayah negara dan kondisi lingkungan sehingga diperlukan pendekatan yang mampu memperkirakan hasil panen berdasarkan beberapa variabel secara bersamaan.
-2. Hubungan antar faktor iklim, penggunaan pestisida, karakteristik wilayah, dan produktivitas tnaaman tidak selalu bersifat linear sehingga diperlukan perbandifngkan antara model regresi konvensional, algoritma Mechin Learning, dan Deep Learning.
+2. Hubungan antar faktor iklim, penggunaan pestisida, karakteristik wilayah, dan produktivitas tanaman tidak selalu bersifat linear sehingga diperlukan perbandingkan antara model regresi konvensional, algoritma Mechine Learning, dan Deep Learning.
 3. Dataset pertanian memiliki karakteristik yang berbeda berdasarkan negara, jenis tanaman, dan tahun pengamatan sehingga diperlukan proses preprocessing untuk memastikan data dapat digunakan dalam proses pekatihan model.
-4. Diperlukan evaluasi terhadap beberpa model Mechine Learning untuk mengetahui model yang memberikan hasil predikssi paling baik dan memiliki kemampuan generalisasi terhadap data pengujian.
+4. Diperlukan evaluasi terhadap beberapa model Mechine Learning untuk mengetahui model yang memberikan hasil prediksi paling baik dan memiliki kemampuan generalisasi terhadap data pengujian.
 
 ### 3.2 Formulasi Learning Problem (WAJIB)
 
@@ -117,8 +113,8 @@ Rumuskan masalah dalam kerangka *Learning Problem*:
 
 | Komponen | Pertanyaan Panduan | Jawaban Anda |
 |----------|--------------------|--------------|
-| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Target yang diprediksi adalah nikai hasil panen komoditas pangan dalan satuan hektogram per hektar (hg/ha). Jenis tugas Mechine Learning yaitu digunakan adalah supervised learning yang berupa regresi kaena target berbentuk nilai numerik kontinu. |
-| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Tujuan optimasi adalah meminimalkan kesalahan prediksi anatara nilai hasil panen aktual dan nilai hasil oanen yang diprediksi model. Fungsi kerugian utaman yang digunakan adalah Mean Squared Error (MSE). Evaluasi performa dilakujan menggunakan RMSE, MAE, R². |
+| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Target yang diprediksi adalah nilai hasil panen komoditas pangan dalam satuan hektogram per hektar (hg/ha). Jenis tugas Mechine Learning yaitu digunakan adalah supervised learning yang berupa regresi karena target berbentuk nilai numerik kontinu. |
+| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Tujuan optimasi adalah meminimalkan kesalahan prediksi anatara nilai hasil panen aktual dan nilai hasil panen yang diprediksi model. Fungsi kerugian utaman yang digunakan adalah Mean Squared Error (MSE). Evaluasi performa dilakujan menggunakan RMSE, MAE, R². |
 | **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Data utama berasal dari Kaggle Crop Yield Prediction Dataset oleh Patelris. File utama yang digunakan adalah yield_df.csv dengan 28.242 observasi, 101 negara, 10 jenis tanaman, dan periode tahun 1990–2013. Data terdiri atas variabel kategorikal dan numerik yang berkaitan dengan hasil panen, negara, jenis tanaman, tahun, suhu rata-rata, curah hujan rata-rata, dan penggunaan pestisida. |
 
 ### 3.3 Goals
