@@ -20,10 +20,10 @@ Laporan ini disusun mengikuti **ML Lifecycle** yang terdiri dari empat tahap ber
 
 | Tahap | Singkatan | Inti Pertanyaan | Bagian Laporan |
 |-------|-----------|-----------------|----------------|
-| **Learning Problem** | **L** | Merumuskan masalah prediksi hasil panen komoditas pangan menggunakan variabel iklim dan penggunaan pestisida. Target prediksi ini berupa nilai hasil panen dalam satuan hektogram per hektar(hg/ha) | Bab 2, 3, 4, 5 |
-| **Model Design** | **M** | Merancang tiga model Regresi, yaitu Linear Rgression sebagai baseline, Random Forest Regressor sebagai model Machine Learning lanjutan, dan Multilayer Perceptron (MLP) sebagai model Deep Learning | Bab 6 (6.x.1 – 6.x.3) |
-| **Optimization** | **O** | Melakukan pelatihan dan optimasi model menggunakan fungsi loss MSE, optimizer yang sesuai, hyperparameter tuning, serta regularisasi untuk mengurangi overfitting. | Bab 6 (6.x.4 – 6.x.6) |
-| **Predict & Evaluate** | **P** | Menghasilkan prediksi hasil panen dan mengevaluasi performa setiap model menggunakan RMSE, MAE, dan R² untuk menentukan model terbaik. | Bab 7 |
+| **Learning Problem** | **L** | Apa target, objective, dan datanya? | Bab 2, 3, 4, 5 |
+| **Model Design** | **M** | Model family/arsitektur apa, hypothesis space, dan inductive bias/asumsi apa? | Bab 6 (6.x.1 – 6.x.3) |
+| **Optimization** | **O** | Bagaimana model dilatih: loss, optimizer, tuning, regularisasi, konvergensi? | Bab 6 (6.x.4 – 6.x.6) |
+| **Predict & Evaluate** | **P** | Seberapa baik prediksi model berdasarkan metrik evaluasi? | Bab 7 |
 
 ```
    L (Learning Problem) ──► M (Model Design) ──► O (Optimization) ──► P (Predict & Evaluate)
