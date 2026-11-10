@@ -55,148 +55,65 @@ Pada proyek ini, mahasiswa diharapkan dapat:
 ## 2. PROJECT OVERVIEW  **[L]**
 
 ### 2.1 Latar Belakang
-**Isi bagian ini dengan:** Sektor pertanian memiliki peran penting dalam memenuhi kebutuhan pada masyarakat. Namun, produktivitas hasil panen dapat dipengaruhi oleh berbagai faktor, seperti perubahan suhu, curah hujan, jenis tanaman, dan penguunaan input pertanian. Menurut Van Klompenburg, Kassahun, dan Catal (2020) dalam penelitian *Crop Yield Precdiction Uasing Machine Learning: A Systematic Literature Revuew*, suhu, curah hujan, dan jenis tanah merupakan beberapa variabel yang sering digunakan dalam penelitian prediksi hasil panen.
+Perubahan iklim global memicu ketidakpastian pola cuaca, peningkatan frekuensi kekeringan ekstrem, dan pergeseran jendela musim tanam yang berdampak langsung pada produktivitas sektor pertanian. Ketidakstabilan ini menyebabkan penurunan hasil panen komoditas pangan pokok secara tidak terduga, memicu inflasi harga pangan, dan mengancam stabilitas rantai pasok global. Selama ini, estimasi hasil panen konvensional kerap bergantung pada pelaporan manual setelah masa panen berakhir, sehingga tindakan mitigasi seperti penyesuaian irigasi dan alokasi cadangan pangan terlambat dilakukan. 
 
-   Salah satu pendekatan yang dapat digunakan adalah Mechine Learning, yaitu dengan memanfaatkan data historis untuk mempelajari hubungan antara faktor-faktor pertanian dan hasil panen. Penelitian Khaki dan Wang (2019) melalui *Crap Yield Prediction Using Deep Neural Networks* menunjukkan bahwwa pendekatan Deep Neural Network mampu mempelajari hubungan kompleks antara faktor lingkungan dan hasil panen serta memberikan hasil prediksi yang lebih baik dibandingkan beberapa model pembanding dalam penelitian mereka tersebut.
-
-   Dengan hal itu, proyek ini memiliki tujuan untuk mengembangkan dan membandingkan tiga model, yaitu Linear Regression, Random Forest Regressor, dan Multilayer Perceptron (MLP), untuk memprediksi hasil panen komoditas pangan. Dataset utama terdiri atas 28.242 observasi dari 101 negara dan 10 jenis tanaman pada periode 1990–2013, dengan variabel tahun, jenis tanaman, wilayah negara, suhu rata-rata, curah hujan rata-rata, dan penggunaan pestisida. Hasil penelitian diharapkan dapat menjadi informasi pendukung dalam analisis produktivitas pertanian dan perencanaan pangan, serta mendukung SDG 2 (Tanpa Kelaparan) dan SDG 13 (Penanganan Perubahan Iklim).
-
-**[Jelaskan konteks dan latar belakang proyek]**
+Pemanfaatan pembelajaran mesin memungkinkan integrasi data historis agroklimat untuk mengenali pola hubungan non linear antara fluktuasi cuaca, asupan agronomis, dan tingkat hasil panen. Penelitian literatur terdahulu telah membuktikan efektivitas pendekatan komputasi ini. Khaki dan Wang (2019) menunjukkan bahwa pemodelan berbasis neural network mampu menangkap interaksi kompleks lingkungan tanaman dengan akurasi tinggi. Selain itu, kajian sistematis oleh Van Klompenburg et al. (2020) mengonfirmasi bahwa algoritma ensemble pohon keputusan dan deep learning secara konsisten mengungguli regresi linear sederhana pada prediksi produktivitas lahan. Oleh karena itu, proyek ini berfokus pada pembangunan sistem estimasi hasil panen untuk menyediakan proyeksi berbasis data bagi perencana kebijakan dan petani sebelum masa panen usai.
 
 ### 2.2 Keterkaitan dengan SDGs (WAJIB)
 
-Ide proyek **berasal dari mahasiswa** dan harus selaras dengan **salah satu** dari 17 Sustainable Development Goals (daftar dan contoh inspirasi ada di Lampiran A).
+Ide proyek **berasal dari mahasiswa** dan harus selaras dengan **salah satu** dari 17 Sustainable Development Goals.
 
 | Komponen | Pertanyaan Panduan | Jawaban Anda |
-|----------|--------------------|--------------|
-| **SDG yang dipilih** | Goal nomor berapa dan apa namanya? | SDG 2 – Zero Hunger (Tanpa Kelaparan) sebagai tujuan utama dan SDG 13 – Climate Action (Penanganan Perubahan Iklim) sebagai tujuan pendukung. |
-| **Target SDG** | Target (misal 3.4, 13.1) mana yang paling relevan? | Target 2, yaitu memastikan sistem produksi pangan berkelanjutan dan menerapkan praktik pertanian tangguh yang mampu beradaptasi terhadap perubahan iklim, cuaca ekstrem, kekeringan, dan banjir. Target pendukung adalah 13, yaitu memperkuat ketahanan dan kemampuan adaptasi terhadap bahaya terkait iklim dan bencana alam. |
-| **Masalah nyata** | Masalah konkret apa yang diangkat? Siapa yang terdampak? | Perubahan kondisi iklim dan perbedaan karakteristik lingkungan antarwilayah dapat memengaruhi produktivitas tanaman pangan. Petani dan pihak yang terlibat dalam perencanaan pangan membutuhkan informasi yang dapat membantu memperkirakan hasil panen berdasarkan faktor-faktor yang tersedia. |
-| **Peran ML** | Mengapa ML/DL cocok? Apa keputusan atau proses yang dibantu? | Machine Learning digunakan untuk mempelajari pola hubungan antara karakteristik tanaman, wilayah, suhu, curah hujan, penggunaan pestisida, dan hasil panen. Model regresi digunakan untuk menghasilkan estimasi kuantitatif hasil panen berdasarkan data historis. |
-| **Indikator kontribusi** | Bagaimana hasil model berkontribusi pada target SDG (langsung/tidak langsung)? | Kontribusi proyek dilihat dari kemampuan model dalam menghasilkan estimasi hasil panen dengan tingkat kesalahan yang terukur melalui RMSE dan MAE serta kemampuan menjelaskan variasi hasil panen melalui R². Hasilnya diharapkan dapat menjadi informasi pendukung analisis produktivitas dan ketahanan pangan. |
-| **Pertimbangan etika** | Risiko bias, privasi, atau dampak salah prediksi? | Dataset memiliki ketidakseimbangan jumlah observasi antarnegara dan perbedaan karakteristik komoditas. Kesalahan prediksi dapat menghasilkan informasi yang kurang tepat apabila digunakan sebagai dasar keputusan pertanian. Oleh karena itu, hasil model perlu disertai evaluasi, keterbatasan data, dan tidak digunakan sebagai satu-satunya dasar pengambilan keputusan. Data yang digunakan merupakan data agregat dan tidak memuat identitas pribadi responden. |
+|---|---|---|
+| **SDG yang dipilih** | Goal nomor berapa dan apa namanya? | SDG 2 – Tanpa Kelaparan (Zero Hunger) |
+| **Target SDG** | Target (misal 3.4, 13.1) mana yang paling relevan? | Target 2.4 – Menjamin sistem produksi pangan yang berkelanjutan dan menerapkan praktik pertanian tangguh yang mampu meningkatkan produktivitas serta adaptif terhadap perubahan iklim dan cuaca ekstrem |
+| **Masalah nyata** | Masalah konkret apa yang diangkat? Siapa yang terdampak? | Tingginya risiko gagal panen akibat cuaca ekstrem dan anomali musim yang tidak menentu. Pihak terdampak meliputi petani kecil yang rentan kehilangan pendapatan serta masyarakat luas akibat lonjakan harga pangan pokok. |
+| **Peran ML** | Mengapa ML/DL cocok? Apa keputusan atau proses yang dibantu? | ML/DL mampu memetakan interaksi multi-fitur non-linear yang kompleks antara suhu, curah hujan tahunan, dan penggunaan input kimia terhadap yield panen, membantu pembuat kebijakan dan petani memproyeksikan stok pangan lebih awal. |
+| **Indikator kontribusi** | Bagaimana hasil model berkontribusi pada target SDG (langsung/tidak langsung)? | Berkontribusi tidak langsung dalam meminimalkan kerugian logistik pangan dan mendukung perencanaan intervensi irigasi adaptif sebelum terjadi krisis pangan lokal. |
+| **Pertimbangan etika** | Risiko bias, privasi, atau dampak salah prediksi? | Risiko bias geografis karena data makro didominasi wilayah dengan infrastruktur stasiun cuaca lengkap. Salah prediksi (overestimate) berisiko menyebabkan kekurangan alokasi bantuan cadangan pangan. Data bersifat statistik agregat publik sehingga tidak melanggar privasi individu. |
 
-**Sumber ide:** Ide proyek berasal dari perhatian terhadap permasalahan perubahan iklim dan pengauhnya terhadap sektor pertanian. Pergeseran musim, perubahan suhu, dan kondisi curah hujan dapat menjadi faktor yang mempengaruhi hasil produksi tanaman pangan. Dari permasalahan tersebut muncul gagasan untuk memanfaatkan data historis peertanian dan iklim sebagai bahan pengembangan model Mechine Learning yang dapat memperkirakan hasil panen komoditas pangan.
-
-   Pengembang ini diharapka dapat membantu proses analisis produktiviatas pertanian serta memberikan informasi tambahan bagi pihak yang berkepentingan dan perencanaan ketahanan pangan.
+**Sumber ide:** Pengamatan langsung terhadap fenomena kemarau berkepanjangan dan anomali musim hujan di wilayah sentra pertanian Jawa Timur yang mengakibatkan fluktuasi hasil panen padi dan jagung serta kesulitan petani lokal dalam menentukan waktu tanam optimal.
 
 ### 2.3 Ringkasan Alur Lifecycle Proyek
-Jelaskan dalam 1 paragraf pendek bagaimana proyek Anda melewati tahap L → M → O → P (dan iterasi apa yang direncanakan).
+Proyek ini mengimplementasikan siklus L-M-O-P secara bertahap, dimulai dari tahap Learning Problem melalui perumusan target regresi hasil panen (hg/ha) serta kurasi dataset agroklimat FAOSTAT. Pada tahap Model Design, dirancang tiga model dengan variasi kapasitas yaitu Linear Regression, Random Forest Regressor, dan Multilayer Perceptron. Tahap Optimization memfokuskan pelatihan model melalui penyesuaian fungsi loss MSE, tuning hyperparameter berbasis validasi, serta penerapan regularisasi Dropout untuk mereduksi overfitting pada neural network. Pada tahap Predict and Evaluate, evaluasi akhir dilakukan pada test set independen menggunakan metrik RMSE, MAE, dan R-squared, yang hasilnya menjadi dasar iterasi umpan balik untuk rekayasa fitur dan penyempurnaan kapasitas arsitektur model.
 
-**[Tulis ringkasan alur lifecycle proyek Anda]**
-
-Proyek ini dimulai dari tahap *Learning Problem [L]* yang merupakan tahapan mengindentifikasi permasalahan prediksi hasil panen dan menentukan variabel yang digunakan, dengan hasil panen dalam satuan hg/ha sebagai target prediksi. Selanjutnya, pada tahap *Model Design [M]*, dirancang tiga model regresi yang terdiri atas Linear Regression, Random Forest Regressor, dan Multilayer Perceptron (MLP). 
-
-Pada tahap *Optimization [O]*, dari masing-masing model dilatih dengan konfigurasi parameter yang sesuai, mengguanakan MSE sebagai fungsi kerugian dan melakukan hyperparameter tuning serta regularisasi pada model yang memerlukannya. Tahap terakhir yaitu *Predict & Evaluate [P]* itu merupakan pengukuran performa model menggunakan RMSE, MAE, R². Hasil evaluasi digunakan untuk membandingkan ketiga model dan menentukan model terbaik. Apabila hasil prediksi belum optimal, proses akan diulang dengan memperbaiki prepprocessing, pemilihan fitur, rancangan model, atau parameter pelatihan.
+---
 
 ## 3. BUSINESS UNDERSTANDING / PROBLEM UNDERSTANDING  **[L]**
 
 ### 3.1 Problem Statements
-Tuliskan 2–4 pernyataan masalah yang jelas dan spesifik.
-
-**Contoh (universal):**
-1. Model perlu mampu memprediksi nilai target dengan akurasi tinggi
-2. Sistem harus dapat mengidentifikasi pola pada citra secara otomatis
-3. Dataset memiliki noise sehingga perlu preprocessing yang tepat
-4. Dibutuhkan model deep learning yang mampu belajar representasi fitur kompleks
-
-**[Tulis problem statements Anda di sini]**
-
-1. Hasil panen komoditas pangan memiliki variasi berdasarkan jenis tanaman, wilayah negara dan kondisi lingkungan sehingga diperlukan pendekatan yang mampu memperkirakan hasil panen berdasarkan beberapa variabel secara bersamaan.
-2. Hubungan antar faktor iklim, penggunaan pestisida, karakteristik wilayah, dan produktivitas tanaman tidak selalu bersifat linear sehingga diperlukan perbandingkan antara model regresi konvensional, algoritma Mechine Learning, dan Deep Learning.
-3. Dataset pertanian memiliki karakteristik yang berbeda berdasarkan negara, jenis tanaman, dan tahun pengamatan sehingga diperlukan proses preprocessing untuk memastikan data dapat digunakan dalam proses pekatihan model.
-4. Diperlukan evaluasi terhadap beberapa model Mechine Learning untuk mengetahui model yang memberikan hasil prediksi paling baik dan memiliki kemampuan generalisasi terhadap data pengujian.
+1. Bagaimana merancang model machine learning yang mampu memetakan hubungan antara faktor agroklimat (curah hujan, suhu) dan input pertanian dengan tingkat akurasi prediksi hasil panen yang andal?
+2. Bagaimana mengatasi kompleksitas dan sifat non linear data iklim pertanian agar model tidak mengalami bias atau kesalahan prediksi yang tinggi?
+3. Bagaimana membandingkan performa pendekatan baseline linear, ensemble pohon keputusan, dan deep learning untuk menentukan representasi arsitektur terbaik dalam tugas estimasi produktivitas panen?
 
 ### 3.2 Formulasi Learning Problem (WAJIB)
 
 Rumuskan masalah dalam kerangka *Learning Problem*:
 
 | Komponen | Pertanyaan Panduan | Jawaban Anda |
-|----------|--------------------|--------------|
-| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Target yang diprediksi adalah nilai hasil panen komoditas pangan dalam satuan hektogram per hektar (hg/ha). Jenis tugas Mechine Learning yaitu digunakan adalah supervised learning yang berupa regresi karena target berbentuk nilai numerik kontinu. |
-| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Tujuan optimasi adalah meminimalkan kesalahan prediksi anatara nilai hasil panen aktual dan nilai hasil panen yang diprediksi model. Fungsi kerugian utaman yang digunakan adalah Mean Squared Error (MSE). Evaluasi performa dilakujan menggunakan RMSE, MAE, R². |
-| **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Data utama berasal dari Kaggle Crop Yield Prediction Dataset oleh Patelris. File utama yang digunakan adalah yield_df.csv dengan 28.242 observasi, 101 negara, 10 jenis tanaman, dan periode tahun 1990–2013. Data terdiri atas variabel kategorikal dan numerik yang berkaitan dengan hasil panen, negara, jenis tanaman, tahun, suhu rata-rata, curah hujan rata-rata, dan penggunaan pestisida. |
+|---|---|---|
+| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Jenis tugas: Regresi (Supervised Learning). Variabel target: Estimasi produktivitas hasil panen tanaman pangan (hg/ha_yield) dalam satuan hektogram per hektar (hg/ha). |
+| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Objective: Meminimalkan fungsi kerugian Mean Squared Error (MSE) selama proses pelatihan. Metrik keberhasilan utama: Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), dan koefisien determinasi R-squared (R²). |
+| **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Sumber: Kaggle Crop Yield Prediction Dataset (FAO & World Bank). Ukuran: 28.242 baris, 7 kolom. Jenis: Data tabular. Asumsi: Sampel independen dan berdistribusi identik (i.i.d.) per musim/wilayah, distribusi train dan test dijaga seimbang melalui random split seragam dengan random state terkontrol. |
 
 ### 3.3 Goals
-
-Tujuan harus spesifik, terukur, dan selaras dengan problem statement.
-**Contoh tujuan:**
-1. Membangun model ML untuk memprediksi variabel target dengan akurasi > 80%
-2. Mengukur performa tiga pendekatan model (baseline, advanced, deep learning)
-3. Menentukan model terbaik berdasarkan metrik evaluasi yang relevan
-4. Menghasilkan sistem yang dapat bekerja secara reproducible
-
-> Sertakan minimal satu goal yang menunjukkan kontribusi terhadap target SDG yang dipilih (Bab 2.2).
-
-**[Tulis goals Anda di sini]**
+1. Membangun model regresi machine learning untuk memprediksi hasil panen tanaman pangan dengan mencapai koefisien determinasi R² lebih besar dari 0.75 pada data uji.
+2. Mengukur dan membandingkan performa tiga pendekatan model yaitu Linear Regression (baseline), Random Forest Regressor (advanced), dan Multilayer Perceptron (deep learning) secara terukur menggunakan metrik RMSE dan MAE.
+3. Mengidentifikasi variabel cuaca dan agronomi yang paling berpengaruh terhadap fluktuasi hasil panen guna mendukung pencapaian target SDG 2.4 terkait pertanian tangguh iklim.
+4. Menghasilkan pipeline eksperimen machine learning yang reproducible dengan struktur repositori kode yang modular dan terdokumentasi rapi.
 
 ### 3.4 Solution Approach  **[M]**
 
 Mahasiswa **WAJIB** menggunakan minimal **tiga model** dengan komposisi sebagai berikut:
-#### **Model 1 – Baseline Model**
-Model sederhana sebagai pembanding dasar.
-**Pilihan model:**
-- Linear Regression (untuk regresi)
-- Logistic Regression (untuk klasifikasi)
-- K-Nearest Neighbors (KNN)
-- Decision Tree
-- Naive Bayes
 
-**[Jelaskan model baseline yang Anda pilih dan alasannya]**
+#### **Model 1 – Baseline Model**
+Model Linear Regression dipilih sebagai model baseline. Model ini bekerja dengan mengasumsikan adanya hubungan linear tertimbang antara fitur masukan (curah hujan, suhu, input pestisida) terhadap target hasil panen. Pemilihan ini bertujuan untuk menetapkan batas bawah performa (benchmark) guna membuktikan apakah hubungan dalam sistem agroklimat dapat dijelaskan oleh model linear sederhana atau membutuhkan pemetaan fungsi yang lebih fleksibel.
 
 #### **Model 2 – Advanced / ML Model**
-Model machine learning yang lebih kompleks.
-**Pilihan model:**
-- Random Forest
-- Gradient Boosting (XGBoost, LightGBM, CatBoost)
-- Support Vector Machine (SVM)
-- Ensemble methods
-- Clustering (K-Means, DBSCAN) - untuk unsupervised
-- PCA / dimensionality reduction (untuk preprocessing)
-
-**[Jelaskan model advanced yang Anda pilih dan alasannya]**
+Model Random Forest Regressor (atau XGBoost Regressor) dipilih sebagai model advanced machine learning. Algoritma ini bekerja berbasis ensemble pohon keputusan yang menggabungkan prediksi dari ratusan decision tree melalui mekanisme bootstrap aggregating. Alasan pemilihannya adalah kemampuannya dalam menangkap interaksi non linear, batas ambang cuaca ekstrem (misalnya batas toleransi suhu tanaman), serta ketahanannya terhadap korelasi antarfitur tanpa membutuhkan asumsi normalitas data.
 
 #### **Model 3 – Deep Learning Model (WAJIB)**
-Model deep learning yang sesuai dengan jenis data.
-**Pilihan Implementasi (pilih salah satu sesuai dataset):**
-**A. Tabular Data:**
-- Multilayer Perceptron (MLP) / Neural Network
-- Minimum: 2 hidden layers
-- Contoh: prediksi harga, klasifikasi binary/multiclass
-
-**B. Image Data:**
-- CNN sederhana (minimum 2 convolutional layers) **ATAU**
-- Transfer Learning (ResNet, VGG, MobileNet, EfficientNet) - **recommended**
-- Contoh: klasifikasi gambar, object detection
-
-**C. Text Data:**
-- LSTM/GRU (minimum 1 layer) **ATAU**
-- Embedding + Dense layers **ATAU**
-- Pre-trained model (BERT, DistilBERT, Word2Vec)
-- Contoh: sentiment analysis, text classification
-
-**D. Time Series:**
-- LSTM/GRU untuk sequential prediction
-- Contoh: forecasting, anomaly detection
-
-**E. Recommender Systems:**
-- Neural Collaborative Filtering (NCF)
-- Autoencoder-based Collaborative Filtering
-- Deep Matrix Factorization
-
-**Minimum Requirements untuk Deep Learning:**
-- ✅ Model harus training minimal 10 epochs
-- ✅ Harus ada plot loss dan accuracy/metric per epoch
-- ✅ Harus ada hasil prediksi pada test set
-- ✅ Training time dicatat (untuk dokumentasi)
-
-**Tidak Diperbolehkan:**
-- ❌ Copy-paste kode tanpa pemahaman
-- ❌ Model tidak di-train (hanya define arsitektur)
-- ❌ Tidak ada evaluasi pada test set
-
-**[Jelaskan model deep learning yang Anda pilih dan alasannya]**
-
+Model Multilayer Perceptron (MLP) Deep Neural Network dipilih sebagai representasi arsitektur deep learning untuk data tabular. Model ini dirancang dengan minimal dua hidden layer yang memanfaatkan fungsi aktivasi ReLU untuk mempelajari representasi fitur yang terdistribusi dan abstrak. Alasan pemilihannya adalah fleksibilitas arsitektur jaringan saraf tiruan dalam menyesuaikan fungsi aproksimasi universal untuk data multivariat, yang dilengkapi dengan layer Dropout dan Batch Normalization guna mengontrol kapasitas hipotesis serta menekan risiko overfitting.
 ---
 
 ## 4. DATA UNDERSTANDING  **[L]**
@@ -975,19 +892,19 @@ Referensi resmi: [Transforming our world: the 2030 Agenda for Sustainable Develo
 ## LAMPIRAN B. FORMULIR PENGAJUAN IDE (DIKUMPULKAN PADA CHECKPOINT 1)
 
 | Komponen | Isian Mahasiswa |
-|----------|-----------------|
-| Nama / NIM | [ ... ] |
-| Judul ide | [ ... ] |
-| SDG & target yang dipilih | [ ... ] |
-| Masalah nyata yang diangkat | [ ... ] |
-| Tugas ML (Target & jenis tugas) | [ ... ] |
-| Objective & metrik utama | [ ... ] |
-| Dataset (sumber, URL, ukuran, jenis data) | [ ... ] |
-| Rencana tiga model (baseline / advanced / deep learning) | [ ... ] |
-| Risiko & pertimbangan etika (bias, privasi) | [ ... ] |
-| Referensi awal (minimal 2) | [ ... ] |
+|---|---|
+| Nama / NIM | Dheandra Khairunnisa Pambudi / 244311009 <br/> Dzakwan Daris Fakhruddin / 244311011 |
+| Judul ide | Fusi Data Penginderaan Jauh dan Parameter Cuaca In Situ untuk Prediksi Kerentanan Pangan Terhadap Anomali Iklim |
+| SDG dan target yang dipilih | Proyek ini berfokus utama pada *Goal 2 Zero Hunger* dengan target untuk menjamin sistem produksi pangan yang berkelanjutan dan memperkuat kapasitas adaptasi terhadap perubahan iklim serta cuaca ekstrem, didukung oleh *Goal 13 Climate Action* khususnya target terkait penguatan ketahanan terhadap bahaya bencana iklim. |
+| Masalah nyata yang diangkat | Pergeseran musim dan kemarau berkepanjangan memicu tingginya risiko gagal panen komoditas pangan pokok, sehingga ketiadaan sistem peramalan dini berbasis iklim menghambat langkah antisipasi petani dan pembuat kebijakan dalam mendistribusikan air, pupuk, serta cadangan logistik pangan. |
+| Tugas ML (Target dan jenis tugas) | - Supervised Learning berupa Regresi (Regression) <br/> - Nilai estimasi hasil panen tanaman pangan (crop yield) per satuan luas lahan dengan satuan hektogram per hektar (hg/ha) berdasarkan variabel iklim, curah hujan, suhu, dan input agronomis |
+| Objective dan metrik utama | Model dioptimasi untuk meminimalkan fungsi kerugian Mean Squared Error atau Root Mean Squared Error, sedangkan performa akhir dievaluasi menggunakan metrik Root Mean Squared Error, Mean Absolute Error, dan nilai R-squared untuk mengukur persentase variansi hasil panen yang berhasil dijelaskan. |
+| Dataset (sumber, URL, ukuran, jenis data) | - [Kaggle Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset) <br/> - Ukuran: 28.242 baris data dan 7 kolom fitur (Area, Item, Year, hg/ha_yield, average_rain_fall_mm_per_year, pesticides_tonnes, avg_temp), ukuran file sekitar 1,2 MB <br/> - Jenis Data: Data tabular (CSV) <br/><br/>- [Agriculture Crop Yield Dataset](https://www.kaggle.com/datasets/samuelotiattakorah/agriculture-crop-yield) <br/> - Ukuran: 1.000.000 baris data dan 10 kolom fitur (mencakup curah hujan, temperatur, pupuk NPK, irigasi, dan hari tanam), ukuran file sekitar 78 MB <br/> - Jenis Data: Data tabular (CSV) <br/> <br/> - [Smart Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/miadul/smart-crop-yield-predication-dataset). <br/> - Ukuran: 1.000 baris data dan 10 kolom fitur (mencakup kelembapan udara, pH tanah, suhu lingkungan, dan takaran pupuk), ukuran file sekitar 75 KB <br/> - Jenis Data: Data tabular (CSV) |
+| Rencana tiga model (baseline / advanced / deep learning) | - Linear Regression sebagai pembanding dasar korelasi linear <br/><br/> - Random Forest Regressor atau XGBoost Regressor untuk menangkap pola non linear dan ambang batas anomali cuaca <br/><br/> - deep learning berupa Multilayer Perceptron minimal dua lapisan tersembunyi yang memanfaatkan fungsi aktivasi ReLU serta teknik regularisasi Dropout dan Batch Normalization. |
+| Risiko dan pertimbangan etika (bias, privasi) | Risiko utama terletak pada potensi bias representasi wilayah akibat kelengkapan pencatatan stasiun cuaca yang timpang serta risiko kesalahan prediksi hasil panen yang dapat memengaruhi alokasi bantuan, sementara aspek privasi tetap aman karena data yang diolah merupakan agregat statistik makro tanpa informasi identitas pribadi. |
+| Referensi awal (minimal 2) | [Khaki, S., dan Wang, L. (2019). Crop yield prediction using deep neural networks. Frontiers in Plant Science, 10, 621.](https://doi.org/10.3389/fpls.2019.00621) <br/><br/> [Van Klompenburg, T., Kassahun, A., dan Catal, C. (2020). Crop yield prediction using machine learning: A systematic literature review. Computers and Electronics in Agriculture, 177, 105709.](https://doi.org/10.1016/j.compag.2020.105709) <br/><br/> [Goodfellow, I., Bengio, Y., dan Courville, A. (2016). Deep Learning. MIT Press.](http://repo.darmajaya.ac.id/4189/1/Deep%20learning_%20adaptive%20computation%20and%20machine%20learning%20%28%20PDFDrive%20%29.pdf) |
 
-**Kriteria persetujuan dosen:**
+Kriteria persetujuan dosen:
 - [ ] Ide berasal dari mahasiswa dan tidak duplikat
 - [ ] Selaras jelas dengan satu SDG dan targetnya
 - [ ] Dapat dirumuskan sebagai masalah ML dengan target yang jelas
