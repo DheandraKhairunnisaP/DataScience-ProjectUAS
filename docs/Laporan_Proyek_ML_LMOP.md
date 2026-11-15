@@ -209,17 +209,75 @@ Dataset ketiga memiliki 10.000 baris data dengan 13 kolom yang memuat informasi 
 
 **Variabel Target:** `Yield_ton_per_ha`
 
-### 4.3 Kondisi Data
+## 4.3 Kondisi Data
 
-Jelaskan kondisi dan permasalahan data:
+Berdasarkan hasil pemeriksaan terhadap ketiga dataset dan file CSV pendukungnya, ditemukan beberapa kondisi dan permasalahan data sebagai berikut:
 
-- **Missing Values:** [Ada/Tidak, berapa persen?]
-- **Duplicate Data:** [Ada/Tidak, berapa banyak?]
-- **Outliers:** [Ada/Tidak, pada fitur apa?]
-- **Imbalanced Data:** [Ada/Tidak, rasio kelas?]
-- **Noise:** [Jelaskan jika ada]
-- **Data Quality Issues:** [Jelaskan jika ada masalah lain]
-- **Asumsi Data (i.i.d., distribusi train-test, potensi data leakage):** [Jelaskan]
+- **Missing Values:**
+
+  1. **Crop Yield Prediction Dataset:** Ditemukan missing values pada `rainfall.csv` sebanyak 780 nilai (11,60%) dan `temp.csv` sebanyak 2.547 nilai (3,57%). Pada `rainfall.csv`, terdapat 774 nilai kosong dan 6 nilai berupa karakter `..` yang tidak sesuai dengan format numerik. Sementara itu, `pesticides.csv`, `yield.csv`, dan `yield_df.csv` tidak memiliki missing values.
+
+  2. **Agriculture Crop Yield Dataset:** Tidak ditemukan missing values pada seluruh kolom dalam `crop_yield.csv`.
+
+  3. **Smart Crop Yield Prediction Dataset:** Ditemukan missing values pada fitur `Irrigation` sebanyak 2.538 nilai (25,38%) dan `Previous_Crop` sebanyak 2.031 nilai (20,31%). Total terdapat 4.569 sel kosong pada kedua fitur tersebut.
+
+- **Duplicate Data:**
+
+  1. **Crop Yield Prediction Dataset:** Ditemukan 6.958 baris duplikat pada `temp.csv` dan 2.310 baris duplikat pada `yield_df.csv` setelah kolom indeks `Unnamed: 0` diabaikan. Sementara itu, `pesticides.csv`, `rainfall.csv`, dan `yield.csv` tidak memiliki duplikat.
+
+  2. **Agriculture Crop Yield Dataset:** Tidak ditemukan baris duplikat pada `crop_yield.csv`.
+
+  3. **Smart Crop Yield Prediction Dataset:** Tidak ditemukan baris duplikat pada `crop_yield_dataset.csv`.
+
+- **Outliers:**
+
+  Deteksi outlier dilakukan menggunakan metode Interquartile Range (IQR) dengan batas 1,5 kali IQR.
+
+  1. **Crop Yield Prediction Dataset:** Ditemukan 615 outlier pada fitur `Value` di `pesticides.csv`, 2 outlier pada `avg_temp` di `temp.csv`, dan 3.169 outlier pada fitur `Value` di `yield.csv`. Pada `yield_df.csv` ditemukan 2.059 outlier pada `hg/ha_yield`, 1.418 pada `pesticides_tonnes`, dan 34 pada `avg_temp`. Total terdapat 3.511 temuan outlier pada tiga fitur tersebut.
+
+  2. **Agriculture Crop Yield Dataset:** Ditemukan 84 outlier pada fitur `Yield_tons_per_hectare`.
+
+  3. **Smart Crop Yield Prediction Dataset:** Tidak ditemukan outlier pada fitur numerik yang diperiksa berdasarkan metode IQR.
+
+  Outlier tidak langsung dianggap sebagai kesalahan data karena beberapa nilai ekstrem dapat merepresentasikan kondisi pertanian yang sebenarnya.
+
+- **Imbalanced Data:**
+
+  Ketiga dataset digunakan untuk tugas regresi dengan target berupa produktivitas hasil panen yang bersifat numerik kontinu. Oleh karena itu, konsep ketidakseimbangan kelas (class imbalance) tidak berlaku secara langsung pada variabel target.
+
+  Meskipun demikian, pemeriksaan distribusi fitur kategorikal menunjukkan bahwa:
+
+  1. **Crop Yield Prediction Dataset:** Distribusi kategori `Area` berkisar antara 24–4.048 data, sedangkan `Item` berkisar antara 556–4.276 data. Hal ini menunjukkan distribusi wilayah dan jenis tanaman yang tidak merata.
+
+  2. **Agriculture Crop Yield Dataset:** Distribusi kategori relatif merata, dengan frekuensi `Region` sebanyak 249.699–250.173, `Soil_Type` sebanyak 166.283–167.119, dan `Crop` sebanyak 166.349–166.824 data.
+
+  3. **Smart Crop Yield Prediction Dataset:** Distribusi kategori juga relatif merata, dengan frekuensi `Crop` sebanyak 2.477–2.536, `Region` sebanyak 2.446–2.561, dan `Soil_Type` sebanyak 3.284–3.388 data.
+
+  Dengan demikian, permasalahan ketidakseimbangan lebih perlu diperhatikan pada distribusi kategori Dataset 1, bukan pada kelas target regresi.
+
+- **Noise:**
+
+  Ditemukan beberapa indikasi gangguan dan ketidakwajaran data. Pada `rainfall.csv` terdapat 6 nilai berupa karakter `..` yang tidak dapat dibaca sebagai angka. Pada `crop_yield.csv` ditemukan 231 nilai negatif pada target `Yield_tons_per_hectare`, yang perlu diverifikasi karena produktivitas hasil panen secara fisik tidak seharusnya bernilai negatif. Selain itu, duplikasi dan nilai ekstrem pada beberapa file Dataset 1 berpotensi memengaruhi kualitas data. Namun, keberadaan noise pengukuran secara pasti masih memerlukan verifikasi terhadap sumber data.
+
+- **Data Quality Issues:**
+
+  Beberapa permasalahan kualitas data yang ditemukan meliputi:
+
+  1. Adanya missing values pada data curah hujan, temperatur, irigasi, dan tanaman sebelumnya.
+  2. Adanya duplikasi baris pada `temp.csv` dan `yield_df.csv`.
+  3. Terdapat 231 nilai produktivitas negatif pada Agriculture Crop Yield Dataset.
+  4. Terdapat perbedaan satuan produktivitas hasil panen, yaitu hg/ha pada Dataset 1 dan ton/ha pada Dataset 2 serta Dataset 3.
+  5. Perbedaan struktur dan nama kolom antar-dataset sehingga diperlukan penyesuaian apabila dilakukan integrasi data.
+  6. Terdapat kolom indeks tambahan `Unnamed: 0` pada `yield_df.csv` yang bukan merupakan variabel utama penelitian.
+  7. Terdapat perbedaan rentang tahun pada file sumber Dataset 1 yang perlu diperhatikan dalam proses penggabungan berdasarkan wilayah dan waktu.
+
+- **Asumsi Data (i.i.d., distribusi train-test, potensi data leakage):**
+
+  1. **Asumsi i.i.d.:** Dataset 1 memiliki informasi wilayah dan tahun sehingga observasi antarperiode berpotensi saling berkaitan. Oleh karena itu, asumsi independensi antarobservasi perlu diperhatikan. Dataset 2 dan Dataset 3 tidak memiliki informasi waktu yang eksplisit sehingga dapat menggunakan pendekatan pembagian data secara acak dengan tetap memperhatikan kemungkinan keterkaitan antarobservasi.
+
+  2. **Distribusi Train-Test:** Dataset 1 disarankan menggunakan pembagian berdasarkan urutan waktu apabila tujuan penelitian adalah memprediksi hasil panen pada periode mendatang. Dataset 2 dan Dataset 3 dapat menggunakan random split, misalnya 80% data training dan 20% data testing dengan random state yang tetap. Karakteristik distribusi data training dan testing perlu dibandingkan untuk memastikan keterwakilan data.
+
+  3. **Potensi Data Leakage:** Pencegahan data leakage dilakukan dengan memastikan data testing tidak digunakan dalam proses imputasi, encoding, scaling, maupun pemilihan fitur. Parameter preprocessing hanya dipelajari dari data training. Selain itu, file sumber dan `yield_df.csv` pada Dataset 1 perlu diperhatikan agar informasi yang sama tidak masuk ke proses pelatihan dan pengujian secara bersamaan.
 
 ### 4.4 Exploratory Data Analysis (EDA) - (**OPSIONAL**)
 
