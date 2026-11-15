@@ -119,29 +119,95 @@ Model Multilayer Perceptron (MLP) Deep Neural Network dipilih sebagai representa
 ## 4. DATA UNDERSTANDING  **[L]**
 ### 4.1 Informasi Dataset
 **Sumber Dataset:**  
-[Sebutkan sumber: Kaggle, UCI ML Repository, atau sumber lain dengan URL]
+Kaggle (https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset)
 
 **Deskripsi Dataset:**
-- Jumlah baris (rows): [angka]
-- Jumlah kolom (columns/features): [angka]
-- Tipe data: [Tabular / Image / Text / Time Series / Audio / Video]
-- Ukuran dataset: [MB/GB]
-- Format file: [CSV / JSON / Images / TXT / etc.]
+- Jumlah baris (rows): 28.242 baris data
+- Jumlah kolom (columns/features): 8 kolom fitur
+- Tipe data: Tabular
+- Ukuran dataset: 1,57 MB
+- Format file: CSV
+
+**Sumber Dataset:**  
+Kaggle (https://www.kaggle.com/datasets/samuelotiattakorah/agriculture-crop-yield)
+
+**Deskripsi Dataset:**
+- Jumlah baris (rows): 1.000.000 baris data
+- Jumlah kolom (columns/features): 10 kolom 
+- Tipe data: Tabular
+- Ukuran dataset: 93.41 MB
+- Format file: CSV
+
+**Sumber Dataset:**  
+Kaggle (https://www.kaggle.com/datasets/miadul/smart-crop-yield-predication-dataset)
+
+**Deskripsi Dataset:**
+- Jumlah baris (rows): 10,000 baris data
+- Jumlah kolom (columns/features): 13 kolom
+- Tipe data: Tabular
+- Ukuran dataset: 0,76 MB
+- Format file: CSV
 
 ### 4.2 Deskripsi Fitur
 Jelaskan setiap fitur/kolom yang ada dalam dataset.
-**Contoh tabel:**
-| Nama Fitur | Tipe Data | Deskripsi | Contoh Nilai |
-|------------|-----------|-----------|--------------|
-| id | Integer | ID unik data | 1, 2, 3 |
-| age | Integer | Usia (tahun) | 25, 30, 45 |
-| income | Float | Pendapatan (juta) | 5.5, 10.2 |
-| category | Categorical | Kategori produk | A, B, C |
-| text | String | Teks ulasan | "Produk bagus..." |
-| image | Image | Citra 224x224 RGB | Array 224x224x3 |
-| label | Categorical | Label target | 0, 1 atau "positif", "negatif" |
+### A. Crop Yield Prediction Dataset
 
-**[Buat tabel deskripsi fitur Anda di sini]**
+Dataset pertama memiliki 8 kolom, termasuk satu kolom indeks tambahan (`Unnamed: 0`).
+
+| Nama Fitur | Tipe Data | Deskripsi | Nilai |
+|---|---|---|---|
+| `Unnamed: 0` | Integer | Nomor indeks setiap baris data yang terbentuk saat penyimpanan dataset. | 0, 1, 2 |
+| `Area` | Object (Kategorikal) | Nama negara atau wilayah tempat tanaman dibudidayakan. | Albania, Algeria |
+| `Item` | Object (Kategorikal) | Jenis tanaman atau komoditas pertanian yang dipanen. | Maize, Potatoes |
+| `Year` | Integer | Tahun pencatatan produktivitas hasil panen. | 1990, 1991 |
+| `hg/ha_yield` | Integer (Numerik) | Produktivitas hasil panen per hektare dalam satuan hektogram per hektare. | 36613, 66667 |
+| `average_rain_fall_mm_per_year` | Float (Numerik) | Rata-rata curah hujan tahunan di suatu wilayah dalam satuan milimeter. | 1485.0, 89.0 |
+| `pesticides_tonnes` | Float (Numerik) | Jumlah penggunaan pestisida dalam proses pertanian dengan satuan ton. | 121.0, 201.0 |
+| `avg_temp` | Float (Numerik) | Rata-rata temperatur wilayah dalam derajat Celsius. | 16.37, 15.36 |
+
+**Variabel Target:** `hg/ha_yield`
+
+
+### B. Agriculture Crop Yield Dataset
+
+Dataset kedua memiliki 1.000.000 baris data dengan 10 kolom yang menggambarkan kondisi lingkungan, penggunaan input pertanian, dan produktivitas hasil panen.
+
+| Nama Fitur | Tipe Data | Deskripsi | Nilai |
+|---|---|---|---|
+| `Region` | Object (Kategorikal) | Wilayah atau kawasan tempat kegiatan pertanian dilakukan. | West, South |
+| `Soil_Type` | Object (Kategorikal) | Jenis tanah yang digunakan sebagai media budidaya tanaman. | Sandy, Clay |
+| `Crop` | Object (Kategorikal) | Jenis tanaman atau komoditas yang dibudidayakan. | Cotton, Rice |
+| `Rainfall_mm` | Float (Numerik) | Jumlah curah hujan di wilayah pertanian dalam satuan milimeter. | 897.08, 992.67 |
+| `Temperature_Celsius` | Float (Numerik) | Temperatur lingkungan pertanian dalam derajat Celsius. | 27.68, 18.03 |
+| `Fertilizer_Used` | Boolean | Menunjukkan apakah penggunaan pupuk dilakukan dalam proses budidaya. | False, True |
+| `Irrigation_Used` | Boolean | Menunjukkan apakah sistem irigasi digunakan dalam kegiatan pertanian. | True, False |
+| `Weather_Condition` | Object (Kategorikal) | Kondisi cuaca yang menyertai proses pertumbuhan tanaman. | Cloudy, Rainy, Sunny |
+| `Days_to_Harvest` | Integer | Jumlah hari yang dibutuhkan tanaman hingga siap dipanen. | 122, 140 |
+| `Yield_tons_per_hectare` | Float (Numerik) | Produktivitas hasil panen dalam satuan ton per hektare. | 6.56, 8.53 |
+
+**Variabel Target:** `Yield_tons_per_hectare`
+
+### C. Smart Crop Yield Prediction Dataset
+
+Dataset ketiga memiliki 10.000 baris data dengan 13 kolom yang memuat informasi mengenai karakteristik tanah, kondisi lingkungan, penggunaan pupuk, metode irigasi, serta produktivitas tanaman.
+
+| Nama Fitur | Tipe Data | Deskripsi | Nilai |
+|---|---|---|---|
+| `Crop` | Object (Kategorikal) | Jenis tanaman yang dibudidayakan. | Maize, Barley |
+| `Region` | Object (Kategorikal) | Kategori wilayah tempat kegiatan pertanian dilakukan. | Region_C, Region_D |
+| `Soil_Type` | Object (Kategorikal) | Jenis tanah yang digunakan dalam proses budidaya tanaman. | Sandy, Loam |
+| `Soil_pH` | Float (Numerik) | Nilai tingkat keasaman atau kebasaan tanah. | 7.01, 5.79 |
+| `Rainfall_mm` | Float (Numerik) | Jumlah curah hujan yang diterima wilayah pertanian dalam milimeter. | 1485.4, 399.4 |
+| `Temperature_C` | Float (Numerik) | Temperatur lingkungan pertanian dalam derajat Celsius. | 19.7, 29.1 |
+| `Humidity_pct` | Float (Numerik) | Tingkat kelembapan udara dalam satuan persen. | 40.3, 55.4 |
+| `Fertilizer_Used_kg` | Float (Numerik) | Jumlah pupuk yang digunakan dalam kegiatan budidaya dengan satuan kilogram. | 105.1, 221.8 |
+| `Irrigation` | Object (Kategorikal) | Metode atau jenis sistem irigasi yang digunakan dalam pengairan tanaman. | Drip, Sprinkler |
+| `Pesticides_Used_kg` | Float (Numerik) | Jumlah penggunaan pestisida dalam satuan kilogram. | 10.2, 35.5 |
+| `Planting_Density` | Float (Numerik) | Tingkat kepadatan penanaman tanaman pada area pertanian. | 23.2, 7.4 |
+| `Previous_Crop` | Object (Kategorikal) | Jenis tanaman yang dibudidayakan pada periode sebelumnya. | Rice, Barley |
+| `Yield_ton_per_ha` | Float (Numerik) | Produktivitas hasil panen dalam satuan ton per hektare. | 101.48, 127.39 |
+
+**Variabel Target:** `Yield_ton_per_ha`
 
 ### 4.3 Kondisi Data
 
