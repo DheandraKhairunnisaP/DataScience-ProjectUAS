@@ -113,7 +113,9 @@ Model Linear Regression dipilih sebagai model baseline. Model ini bekerja dengan
 Model Random Forest Regressor (atau XGBoost Regressor) dipilih sebagai model advanced machine learning. Algoritma ini bekerja berbasis ensemble pohon keputusan yang menggabungkan prediksi dari ratusan decision tree melalui mekanisme bootstrap aggregating. Alasan pemilihannya adalah kemampuannya dalam menangkap interaksi non linear, batas ambang cuaca ekstrem (misalnya batas toleransi suhu tanaman), serta ketahanannya terhadap korelasi antarfitur tanpa membutuhkan asumsi normalitas data.
 
 #### **Model 3 – Deep Learning Model (WAJIB)**
+
 Model Multilayer Perceptron (MLP) Deep Neural Network dipilih sebagai representasi arsitektur deep learning untuk data tabular. Model ini dirancang dengan minimal dua hidden layer yang memanfaatkan fungsi aktivasi ReLU untuk mempelajari representasi fitur yang terdistribusi dan abstrak. Alasan pemilihannya adalah fleksibilitas arsitektur jaringan saraf tiruan dalam menyesuaikan fungsi aproksimasi universal untuk data multivariat, yang dilengkapi dengan layer Dropout dan Batch Normalization guna mengontrol kapasitas hipotesis serta menekan risiko overfitting.
+
 ---
 
 ## 4. DATA UNDERSTANDING  **[L]**
@@ -334,7 +336,22 @@ Missing Values:
 - Alasan: Median lebih robust terhadap outliers dibanding mean
 ```
 
-**[Jelaskan langkah-langkah data cleaning yang Anda lakukan]**
+Proses data cleaning dilakukan untuk memperbaiki permasalahan kualitas data yang ditemukan pada tahap Data Understanding. Penanganan dilakukan berdasarkan karakteristik masing-masing dataset.
+
+1. **Handling Missing Values:** 
+   Nilai kosong pada `rainfall.csv` ditangani menggunakan imputasi median berdasarkan wilayah, dengan median keseluruhan sebagai alternatif apabila nilai wilayah tidak tersedia. Missing values pada `temp.csv` ditangani menggunakan median temperatur berdasarkan negara. Sementara itu, missing values pada fitur kategorikal `Irrigation` dan `Previous_Crop` di Dataset 3 diisi menggunakan kategori `Unknown`.
+
+2. **Removing Duplicates:**
+   Duplikasi dihapus pada `temp.csv` dan `yield_df.csv` setelah kolom indeks tambahan pada `yield_df.csv` dihilangkan. Dataset lainnya dipertahankan apabila tidak ditemukan duplikasi.
+
+3. **Handling Outliers:**
+   Nilai ekstrem yang terdeteksi menggunakan metode IQR tidak langsung dihapus karena belum dapat dipastikan merupakan kesalahan pencatatan. Nilai tersebut dipertahankan agar variasi kondisi pertanian tetap terwakili.
+
+4. **Data Type Conversion:**
+   Kolom numerik seperti tahun, curah hujan, temperatur, pestisida, dan produktivitas hasil panen dikonversi menjadi tipe numerik agar dapat digunakan dalam perhitungan dan pemodelan.
+
+5. **Penanganan Nilai Tidak Valid:**
+   Sebanyak 231 baris dengan nilai produktivitas negatif pada Agriculture Crop Yield Dataset dihapus karena tidak sesuai dengan karakteristik fisik hasil panen.
 
 ### 5.2 Feature Engineering
 **Aktivitas:**
@@ -343,7 +360,19 @@ Missing Values:
 - Feature selection
 - Dimensionality reduction
 
-**[Jelaskan feature engineering yang Anda lakukan]**
+Feature engineering dilakukan untuk membentuk dan memilih fitur yang relevan dengan tujuan prediksi produktivitas hasil panen.
+
+1. **Creating New Features:**
+   Membuat fitur baru bernama `Rainfall_Temp_Interaction` melalui perkalian antara curah hujan dan temperatur. Fitur ini digunakan untuk memberikan representasi interaksi kedua faktor iklim kepada model.
+
+2. **Feature Extraction:**
+   Mengekstraksi informasi interaksi curah hujan dan temperatur dari fitur yang telah tersedia pada masing-masing dataset.
+
+3. **Feature Selection:**
+   Memilih fitur prediktor yang relevan dengan produktivitas hasil panen, seperti wilayah, jenis tanaman, curah hujan, temperatur, penggunaan pupuk, pestisida, dan karakteristik pertanian lainnya. Variabel target dipisahkan dari fitur input untuk kebutuhan pemodelan.
+
+4. **Dimensionality Reduction:**
+   Reduksi dimensi menggunakan PCA belum diterapkan karena jumlah fitur masih relatif sedikit dan setiap variabel memiliki informasi yang relevan serta mudah diinterpretasikan. Pendekatan ini mempertahankan karakteristik asli data untuk tahap pemodelan selanjutnya.
 
 ### 5.3 Data Transformation
 
