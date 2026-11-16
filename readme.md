@@ -22,6 +22,13 @@ Struktur direktori dokumentasi pada folder `docs/` dirinci sebagai berikut:
 * [docs/Laporan_Proyek_ML_LMOP.md](docs/Laporan_Proyek_ML_LMOP.md)
   Draf utama template laporan komprehensif dari Bab 1 hingga Bab 10 yang mencakup seluruh alur siklus hidup proyek.
 
+## NOTEBOOK EKSPERIMEN
+
+* [notebooks/01_learning_problem_eda.ipynb](notebooks/01_learning_problem_eda.ipynb)
+  Eksplorasi data awal, statistik deskriptif, serta visualisasi distribusi hasil panen dan korelasi parameter agroklimat.
+* [notebooks/02_data_preparation.ipynb](notebooks/02_data_preparation.ipynb)
+  Audit kualitas data, pembersihan nilai kosong dan duplikat, rekayasa fitur interaksi iklim, serta pembagian dataset (train/validation/test) dan transformasi skala.
+
 ---
 
 ## RINGKASAN PROYEK
