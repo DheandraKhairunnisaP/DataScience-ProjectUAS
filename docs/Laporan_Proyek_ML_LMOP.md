@@ -284,25 +284,25 @@ Berdasarkan hasil pemeriksaan terhadap ketiga dataset dan file CSV pendukungnya,
 ### 4.4 Exploratory Data Analysis (Visualisasi dan Insight)
 
 #### 1. Distribusi Variabel Target Hasil Panen (`hg/ha_yield`)
-![Distribusi Hasil Panen](../eda_plots/eda_1_distribusi_yield.png)
+![Distribusi Hasil Panen](./eda_plots/eda_1_distribusi_yield.png)
 
 * **Insight:**  
   Distribusi nilai `hg/ha_yield` bersifat miring ke kanan (*right-skewed*) dengan puncak frekuensi tertinggi berada di bawah 50.000 hg/ha (median 38.295 hg/ha), sementara ekor distribusi memanjang hingga 501.412 hg/ha. Kemiringan ini mengonfirmasi perlunya kombinasi metrik evaluasi MAE dan RMSE agar penilaian performa model tidak terdistorsi oleh komoditas dengan bobot panen tinggi.
 
 #### 2. Perbandingan Rata-Rata Hasil Panen per Jenis Komoditas
-![Rata-Rata Hasil Panen per Komoditas](../eda_plots/eda_2_yield_per_komoditas.png)
+![Rata-Rata Hasil Panen per Komoditas](./eda_plots/eda_2_yield_per_komoditas.png)
 
 * **Insight:**  
   Terdapat kesenjangan skala produktivitas yang tajam antarjenis tanaman. Kelompok umbi-umbian seperti *Potatoes* (mendekati 200.000 hg/ha) dan *Cassava* (sekitar 150.000 hg/ha) mencatat bobot panen per hektar beberapa kali lipat lebih tinggi dibandingkan kelompok serealia dan kacang-kacangan seperti *Rice, paddy*, *Maize*, *Wheat*, *Sorghum*, dan *Soybeans* (di bawah 45.000 hg/ha). Fitur `Item` terbukti menjadi pembeda utama skala target.
 
 #### 3. Korelasi Antar Variabel Agroklimat dan Hasil Panen
-![Heatmap Korelasi Fitur](../eda_plots/eda_3_korelasi_fitur.png)
+![Heatmap Korelasi Fitur](./eda_plots/eda_3_korelasi_fitur.png)
 
 * **Insight:**  
   Korelasi linear Pearson antara fitur numerik tunggal terhadap target `hg/ha_yield` sangat rendah, yaitu `0.00` untuk curah hujan (`average_rain_fall_mm_per_year`), `-0.11` untuk suhu rata-rata (`avg_temp`), `0.06` untuk pestisida (`pesticides_tonnes`), dan `0.09` untuk tahun (`Year`). Rendahnya korelasi linear ini membuktikan bahwa respons tanaman terhadap iklim bersifat non-linear dan bergantung pada interaksi antarvariabel, sehingga memvalidasi penggunaan model non-linear (*Random Forest* dan *Multilayer Perceptron*) serta penambahan fitur interaksi iklim.
 
 #### 4. Tren Rata-Rata Hasil Panen Global per Tahun
-![Tren Hasil Panen per Tahun](../eda_plots/eda_4_tren_tahunan.png)
+![Tren Hasil Panen per Tahun](./eda_plots/eda_4_tren_tahunan.png)
 
 * **Insight:**  
   Sepanjang periode pengamatan 1990 hingga 2013, rata-rata hasil panen global menunjukkan lintasan naik secara konsisten dari kisaran 66.000 hg/ha menjadi lebih dari 90.000 hg/ha. Meski tren jangka panjangnya positif berkat intensifikasi teknologi pertanian, grafik memperlihatkan perlambatan dan penurunan sesaat pada beberapa titik tahun (seperti 1991, 2006, dan 2012) yang selaras dengan fase anomali iklim global.
