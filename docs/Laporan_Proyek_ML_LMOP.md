@@ -309,127 +309,67 @@ Berdasarkan hasil pemeriksaan terhadap ketiga dataset dan file CSV pendukungnya,
 
 ---
 
-## 5. DATA PREPARATION  **[L]**
+## 5. DATA PREPARATION **[L]**
 
-Bagian ini menjelaskan **semua** proses transformasi dan preprocessing data yang dilakukan.
 ### 5.1 Data Cleaning
-**Aktivitas:**
-- Handling missing values
-- Removing duplicates
-- Handling outliers
-- Data type conversion
-**Contoh:**
-```
-Missing Values:
-- Fitur 'age' memiliki 50 missing values (5% dari data)
-- Strategi: Imputasi dengan median karena distribusi skewed
-- Alasan: Median lebih robust terhadap outliers dibanding mean
-```
 
-Proses data cleaning dilakukan untuk memperbaiki permasalahan kualitas data yang ditemukan pada tahap Data Understanding. Penanganan dilakukan berdasarkan karakteristik masing-masing dataset.
+Tahap pembersihan data dijalankan secara terprogram pada seluruh berkas untuk menjamin integritas numerik dan menghilangkan anomali pencatatan:
 
-1. **Handling Missing Values:** 
-   Nilai kosong pada `rainfall.csv` ditangani menggunakan imputasi median berdasarkan wilayah, dengan median keseluruhan sebagai alternatif apabila nilai wilayah tidak tersedia. Missing values pada `temp.csv` ditangani menggunakan median temperatur berdasarkan negara. Sementara itu, missing values pada fitur kategorikal `Irrigation` dan `Previous_Crop` di Dataset 3 diisi menggunakan kategori `Unknown`.
+1. **Standardisasi Header & Penghapusan Kolom Indeks:** Menghapus spasi berlebih pada nama kolom serta membuang kolom indeks tambahan (`Unnamed: 0`) pada `yield_df.csv`.
+2. **Konversi Tipe Numerik & Penanganan Noise:** Mengonversi seluruh kolom numerik menggunakan `pd.to_numeric(..., errors='coerce')` sehingga karakter noise `'..'` pada `rainfall.csv` otomatis berubah menjadi nilai kosong (`NaN`).
+3. **Penghapusan Baris Duplikat:** Menghapus baris duplikat identik, termasuk **2.310** baris duplikat pada `yield_df.csv` (menyisakan **25.932** baris bersih) dan **6.958** duplikat pada `temp.csv`.
+4. **Imputasi Missing Values:** Mengisi nilai kosong curah hujan (`rainfall.csv`) dan suhu (`temp.csv`) menggunakan nilai **median per wilayah/negara** agar tidak terpengaruh pencilan ekstrem antarnegara. Pada `crop_yield_dataset.csv`, nilai kosong pada fitur kategorikal `Irrigation` dan `Previous_Crop` diisi dengan kategori `'Unknown'`.
+5. **Filtering Target Tidak Valid:** Menghapus **231** baris pada `crop_yield.csv` yang memiliki nilai target `Yield_tons_per_hectare < 0` (menyisakan **999.769** baris bersih) karena hasil panen tidak mungkin bernilai negatif.
 
-2. **Removing Duplicates:**
-   Duplikasi dihapus pada `temp.csv` dan `yield_df.csv` setelah kolom indeks tambahan pada `yield_df.csv` dihilangkan. Dataset lainnya dipertahankan apabila tidak ditemukan duplikasi.
-
-3. **Handling Outliers:**
-   Nilai ekstrem yang terdeteksi menggunakan metode IQR tidak langsung dihapus karena belum dapat dipastikan merupakan kesalahan pencatatan. Nilai tersebut dipertahankan agar variasi kondisi pertanian tetap terwakili.
-
-4. **Data Type Conversion:**
-   Kolom numerik seperti tahun, curah hujan, temperatur, pestisida, dan produktivitas hasil panen dikonversi menjadi tipe numerik agar dapat digunakan dalam perhitungan dan pemodelan.
-
-5. **Penanganan Nilai Tidak Valid:**
-   Sebanyak 231 baris dengan nilai produktivitas negatif pada Agriculture Crop Yield Dataset dihapus karena tidak sesuai dengan karakteristik fisik hasil panen.
+---
 
 ### 5.2 Feature Engineering
-**Aktivitas:**
-- Creating new features
-- Feature extraction
-- Feature selection
-- Dimensionality reduction
 
-Feature engineering dilakukan untuk membentuk dan memilih fitur yang relevan dengan tujuan prediksi produktivitas hasil panen.
+Untuk menangkap efek gabungan antara ketersediaan air dan tekanan panas lingkungan terhadap fisiologi tanaman, dibentuk satu fitur interaksi baru pada ketiga dataset utama:
 
-1. **Creating New Features:**
-   Membuat fitur baru bernama `Rainfall_Temp_Interaction` melalui perkalian antara curah hujan dan temperatur. Fitur ini digunakan untuk memberikan representasi interaksi kedua faktor iklim kepada model.
+* **Fitur Baru (`Rainfall_Temp_Interaction`):** Dihitung dari hasil perkalian curah hujan dengan suhu rata-rata (`average_rain_fall_mm_per_year * avg_temp` pada Dataset 1, `Rainfall_mm * Temperature_Celsius` pada Dataset 2, dan `Rainfall_mm * Temperature_C` pada Dataset 3). Fitur ini membantu model membedakan kondisi curah hujan tinggi pada suhu sejuk dengan curah hujan tinggi pada suhu ekstrem yang memicu tingkat evapotranspirasi berbeda.
+* **Seleksi Fitur:** Setelah pembentukan fitur interaksi, Dataset 1 memiliki **7 fitur prediktor**, Dataset 2 memiliki **10 fitur prediktor**, dan Dataset 3 memiliki **13 fitur prediktor**.
 
-2. **Feature Extraction:**
-   Mengekstraksi informasi interaksi curah hujan dan temperatur dari fitur yang telah tersedia pada masing-masing dataset.
-
-3. **Feature Selection:**
-   Memilih fitur prediktor yang relevan dengan produktivitas hasil panen, seperti wilayah, jenis tanaman, curah hujan, temperatur, penggunaan pupuk, pestisida, dan karakteristik pertanian lainnya. Variabel target dipisahkan dari fitur input untuk kebutuhan pemodelan.
-
-4. **Dimensionality Reduction:**
-   Reduksi dimensi menggunakan PCA belum diterapkan karena jumlah fitur masih relatif sedikit dan setiap variabel memiliki informasi yang relevan serta mudah diinterpretasikan. Pendekatan ini mempertahankan karakteristik asli data untuk tahap pemodelan selanjutnya.
+---
 
 ### 5.3 Data Transformation
 
-**Untuk Data Tabular:**
-- Encoding (Label Encoding, One-Hot Encoding, Ordinal Encoding)
-- Scaling (Standardization, Normalization, MinMaxScaler)
+Transformasi fitur diterapkan menggunakan `ColumnTransformer` dengan pemisahan perlakuan berdasarkan tipe variabel:
 
-**Untuk Data Text:**
-- Tokenization
-- Lowercasing
-- Removing punctuation/stopwords
-- Stemming/Lemmatization
-- Padding sequences
-- Word embedding (Word2Vec, GloVe, fastText)
+* **Scaling Fitur Numerik (`StandardScaler`):** Seluruh fitur numerik distandardisasi agar memiliki rata-rata ($\mu$) = 0 dan simpangan baku ($\sigma$) = 1. Langkah ini krusial agar variabel berskala ratusan ribu seperti `pesticides_tonnes` tidak mendominasi perhitungan gradien pada model *Linear Regression* dan *Multilayer Perceptron*.
+* **Encoding Fitur Kategorikal (`OneHotEncoder`):** Fitur kategorikal dan boolean diubah menjadi vektor biner menggunakan `OneHotEncoder(handle_unknown='ignore', sparse_output=False)` sehingga algoritma matematis dapat memproses informasi wilayah dan jenis komoditas tanpa menciptakan asumsi urutan numerik palsu. Setelah transformasi, dimensi fitur akhir menjadi **116 kolom** pada Dataset 1, **27 kolom** pada Dataset 2, dan **28 kolom** pada Dataset 3.
+* **Pencegahan Data Leakage:** Objek `preprocessor` hanya di-`fit` menggunakan partisi data latih (`X_train`), lalu parameter skala dan kategorinya diterapkan untuk men-`transform` data validasi (`X_val`) dan data uji (`X_test`).
 
-**Untuk Data Image:**
-- Resizing
-- Normalization (pixel values 0-1 atau -1 to 1)
-- Data augmentation (rotation, flip, zoom, brightness, etc.)
-- Color space conversion
-
-**Untuk Time Series:**
-- Creating time windows
-- Lag features
-- Rolling statistics
-- Differencing
-
-**[Jelaskan transformasi yang Anda lakukan]**
+---
 
 ### 5.4 Data Splitting
 
-**Strategi pembagian data:**
-```
-- Training set: [X]% ([jumlah] samples)
-- Validation set: [X]% ([jumlah] samples) - jika ada
-- Test set: [X]% ([jumlah] samples)
-```
-**Contoh:**
-```
-Menggunakan stratified split untuk mempertahankan distribusi kelas:
-- Training: 80% (8000 samples)
-- Test: 20% (2000 samples)
-- Random state: 42 untuk reproducibility
-```
+Setiap dataset dibagi secara acak menjadi tiga partisi independen dengan rasio **70% Training**, **15% Validation**, dan **15% Testing** menggunakan `random_state=42` untuk menjamin reproduktibilitas eksperimen:
 
-> **Penting:** Test set hanya digunakan **sekali** pada tahap P (evaluasi akhir). Tuning pada tahap O hanya boleh memakai validation set / cross-validation. Fit scaler/encoder hanya pada data training untuk menghindari data leakage.
+| Dataset | Total Data Bersih | Training Set (70%) | Validation Set (15%) | Test Set (15%) | Dimensi Fitur Akhir |
+|---|---|---|---|---|---|
+| **Dataset 1** (`yield_df.csv`) | 25.932 | **18.152** | **3.890** | **3.890** | 116 |
+| **Dataset 2** (`crop_yield.csv`) | 999.769 | **699.838** | **149.965** | **149.966** | 27 |
+| **Dataset 3** (`crop_yield_dataset.csv`) | 10.000 | **7.000** | **1.500** | **1.500** | 28 |
 
-**[Jelaskan strategi splitting Anda dan alasannya]**
+Partisi *Test Set* disimpan terpisah dalam berkas terserialisasi (`processed_data/*_splits.pkl`) dan tidak digunakan selama proses eksplorasi, transformasi, maupun penyetelan hyperparameter.
 
-### 5.5 Data Balancing (jika diperlukan)
-**Teknik yang digunakan:**
-- SMOTE (Synthetic Minority Over-sampling Technique)
-- Random Undersampling
-- Class weights
-- Ensemble sampling
+---
 
-**[Jelaskan jika Anda melakukan data balancing]**
+### 5.5 Data Balancing
 
-### 5.6 Ringkasan Data Preparation
+Teknik *data balancing* (seperti *oversampling* SMOTE atau *undersampling*) **tidak diterapkan** pada proyek ini karena perumusan masalah merupakan tugas **regresi nilai kontinu** (`hg/ha_yield` dan `ton/ha`), bukan klasifikasi kelas diskrit. Pengubahan distribusi sampel sintetis pada target kontinu berisiko merusak hubungan fisik riil antara parameter cuaca dan produktivitas panen.
 
-**Per langkah, jelaskan:**
-1. **Apa** yang dilakukan
-**[Jelaskan ]**
-2. **Mengapa** penting
-**[Jelaskan Mengapa ?]**
-3. **Bagaimana** implementasinya
-**[Jelaskan Bagaimana]**
+---
+
+### 5.6 Ringkasan Data Preparation (Apa – Mengapa – Bagaimana)
+
+| Tahapan | Apa yang Dilakukan | Mengapa Dilakukan | Bagaimana Dilakukan |
+|---|---|---|---|
+| **Data Cleaning** | Pembersihan noise karakter, penghapusan duplikat dan nilai target negatif, serta imputasi nilai kosong | Mencegah kegagalan komputasi numerik, bias bobot akibat data ganda, dan distorsi target yang tidak valid secara fisik | Menggunakan `pd.to_numeric(errors='coerce')`, `drop_duplicates()`, filter `>= 0`, serta imputasi median per kelompok wilayah |
+| **Feature Engineering** | Pembentukan variabel interaksi `Rainfall_Temp_Interaction` | Korelasi linear fitur cuaca tunggal sangat lemah sehingga dibutuhkan representasi efek gabungan curah hujan dan suhu | Mengalikan kolom curah hujan dengan kolom suhu lingkungan pada masing-masing dataset |
+| **Data Splitting** | Pembagian dataset menjadi 70% *train*, 15% *validation*, dan 15% *test* | Menyediakan data evaluasi yang objektif dan mencegah kebocoran informasi (*data leakage*) dari data uji | Dua tahap `train_test_split` (rasio 0,30 lalu 0,50) dengan `random_state=42` sebelum proses *fitting* transformasi |
+| **Data Transformation** | Standardisasi fitur numerik dan pengkodean biner fitur kategorikal | Menyamakan rentang skala fitur agar konvergensi gradien stabil serta mengubah teks kategori menjadi representasi numerik | Menggunakan `ColumnTransformer` (`StandardScaler` dan `OneHotEncoder`) yang di-`fit` eksklusif pada `X_train` |
 
 ---
 
