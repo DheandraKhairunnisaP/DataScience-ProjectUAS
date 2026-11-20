@@ -427,9 +427,9 @@ y_pred_baseline = model_baseline.predict(X_test)
 
 * **Teori Singkat:**  
   *Extreme Gradient Boosting* (XGBoost) adalah algoritma *ensemble learning* berbasis pohon keputusan (*Classification and Regression Trees* / CART) yang membangun model secara sekuensial melalui kerangka *gradient boosting*. Pada setiap iterasi $t$, pohon keputusan baru $f_t(\mathbf{x})$ dilatih untuk memprediksi gradien negatif (residual) dari kesalahan prediksi akumulatif pohon-pohon sebelumnya:
-  $$\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(\mathbf{x}_i)$$
+  $`\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(\mathbf{x}_i)`$
   dengan fungsi objektif terregularisasi yang meminimalkan *loss* prediksi sekaligus mengontrol kompleksitas struktur pohon:
-  $$\mathcal{L}^{(t)} = \sum_{i=1}^{n} l\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) + \Omega(f_t), \quad \Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^{T} w_j^2$$
+  $`\mathcal{L}^{(t)} = \sum_{i=1}^{n} l\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) + \Omega(f_t), \quad \Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^{T} w_j^2`$
   di mana $\eta$ adalah *learning rate*, $T$ merupakan jumlah daun (*leaves*), $w_j$ adalah bobot skor pada daun ke-$j$, serta $\gamma$ dan $\lambda$ merupakan parameter penalti regularisasi.
 
 * **Alasan Pemilihan Berdasarkan Karakteristik Data:**  
@@ -443,13 +443,7 @@ y_pred_baseline = model_baseline.predict(X_test)
 
 * **Hypothesis Space ($\mathcal{H}$):**  
   Himpunan fungsi aditif yang merupakan penjumlahan terbobot dari $K$ buah pohon regresi:
-  ```math
-  \mathcal{H} = \left\{
-  F(\mathbf{x}) = \sum_{k=1}^{K} f_k(\mathbf{x})
-  \;\middle|\;
-  f_k \in \mathcal{F}
-  \right\}
-  ```
+  $`\mathcal{H} = \left\{ F(\mathbf{x}) = \sum_{k=1}^{K} f_k(\mathbf{x}) \,\middle|\, f_k \in \mathcal{F} \right\}`$
   di mana $\mathcal{F}$ adalah ruang seluruh pohon regresi CART dengan kedalaman maksimum `max_depth` tertentu yang memetakan vektor fitur $\mathbf{x} \in \mathbb{R}^d$ ke skor daun kontinu $w \in \mathbb{R}^T$.
 
 * **Inductive Bias:**  
