@@ -443,7 +443,13 @@ y_pred_baseline = model_baseline.predict(X_test)
 
 * **Hypothesis Space ($\mathcal{H}$):**  
   Himpunan fungsi aditif yang merupakan penjumlahan terbobot dari $K$ buah pohon regresi:
-  $$\mathcal{H} = \left\{ F(\mathbf{x}) = \sum_{k=1}^{K} f_k(\mathbf{x}) \,\middle|\, f_k \in \mathcal{F} \right\}$$
+  ```math
+  \mathcal{H} = \left\{
+  F(\mathbf{x}) = \sum_{k=1}^{K} f_k(\mathbf{x})
+  \;\middle|\;
+  f_k \in \mathcal{F}
+  \right\}
+  ```
   di mana $\mathcal{F}$ adalah ruang seluruh pohon regresi CART dengan kedalaman maksimum `max_depth` tertentu yang memetakan vektor fitur $\mathbf{x} \in \mathbb{R}^d$ ke skor daun kontinu $w \in \mathbb{R}^T$.
 
 * **Inductive Bias:**  
