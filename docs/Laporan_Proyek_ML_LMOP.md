@@ -421,68 +421,70 @@ y_pred_baseline = model_baseline.predict(X_test)
 
 ---
 
-### 6.2 Model 2 — ML / Advanced Model
+### 6.2 Model 2 (Advanced): Extreme Gradient Boosting (XGBoost Regressor) **[M]**
 
-#### 6.2.1 Deskripsi Model  **[M]**
+#### 6.2.1 Teori dan Alasan Pemilihan Model
 
-**Nama Model:** [Nama model, misal: Random Forest / XGBoost]  
-**Teori Singkat:**  
-[Jelaskan bagaimana algoritma ini bekerja]
+* **Teori Singkat:**  
+  *Extreme Gradient Boosting* (XGBoost) adalah algoritma *ensemble learning* berbasis pohon keputusan (*Classification and Regression Trees* / CART) yang membangun model secara sekuensial melalui kerangka *gradient boosting*. Pada setiap iterasi $t$, pohon keputusan baru $f_t(\mathbf{x})$ dilatih untuk memprediksi gradien negatif (residual) dari kesalahan prediksi akumulatif pohon-pohon sebelumnya:
+  $$\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(\mathbf{x}_i)$$
+  dengan fungsi objektif terregularisasi yang meminimalkan *loss* prediksi sekaligus mengontrol kompleksitas struktur pohon:
+  $$\mathcal{L}^{(t)} = \sum_{i=1}^{n} l\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) + \Omega(f_t), \quad \Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^{T} w_j^2$$
+  di mana $\eta$ adalah *learning rate*, $T$ merupakan jumlah daun (*leaves*), $w_j$ adalah bobot skor pada daun ke-$j$, serta $\gamma$ dan $\lambda$ merupakan parameter penalti regularisasi.
 
-**Alasan Pemilihan:**  
-[Mengapa memilih model ini?]
+* **Alasan Pemilihan Berdasarkan Karakteristik Data:**  
+  1. **Menangkap Hubungan Non-Linear & Interaksi Agroklimat:** Hasil EDA pada Bab 4.4 menunjukkan bahwa korelasi linear fitur cuaca tunggal terhadap hasil panen sangat lemah ($r = 0,00$ untuk curah hujan dan $r = -0,11$ untuk suhu). Struktur percabangan bertingkat pada XGBoost mampu memodelkan interaksi non-linear antarvariabel iklim, komoditas, dan wilayah tanpa memerlukan asumsi linearitas.
+  2. **Efisiensi Skala Besar dengan GPU Histogram:** Dataset 2 memiliki hampir 700.000 baris data latih, sedangkan Dataset 1 memiliki 116 dimensi fitur hasil *one-hot encoding*. Metode `tree_method='hist'` yang dijalankan pada GPU (`cuda`) mempercepat pencarian titik pisah (*split finding*) secara signifikan dibandingkan algoritma berbasis pohon konvensional di CPU.
+  3. **Ketahanan terhadap Pencilan (*Outlier*):** Sebagaimana ditemukan pada audit kondisi data (Bab 4.3), variabel `pesticides_tonnes` dan target `hg/ha_yield` memiliki rentang nilai yang lebar dan miring ke kanan (*right-skewed*). Pemisahan berbasis ambang batas (*threshold splitting*) pada pohon keputusan membuat XGBoost kebal terhadap distorsi pencilan skala ekstrem.
 
-**Keunggulan:**
-- [Sebutkan keunggulan]
+---
 
-**Kelemahan:**
-- [Sebutkan kelemahan]
+#### 6.2.2 Hypothesis Space, Inductive Bias, Keunggulan, dan Kelemahan
 
-#### 6.2.2 Hypothesis Space & Inductive Bias  **[M]**
+* **Hypothesis Space ($\mathcal{H}$):**  
+  Himpunan fungsi aditif yang merupakan penjumlahan terbobot dari $K$ buah pohon regresi:
+  $$\mathcal{H} = \left\{ F(\mathbf{x}) = \sum_{k=1}^{K} f_k(\mathbf{x}) \,\middle|\, f_k \in \mathcal{F} \right\}$$
+  di mana $\mathcal{F}$ adalah ruang seluruh pohon regresi CART dengan kedalaman maksimum `max_depth` tertentu yang memetakan vektor fitur $\mathbf{x} \in \mathbb{R}^d$ ke skor daun kontinu $w \in \mathbb{R}^T$.
 
-- **Model family / arsitektur:** [misal: ensemble pohon keputusan]
-- **Hypothesis space:** [fungsi non-linear piecewise, interaksi fitur otomatis, dll.]
-- **Inductive bias / asumsi:** [misal: data tabular dengan struktur ambang/threshold]
-- **Perbandingan dengan baseline:** [apa yang bisa dipelajari model ini yang tidak bisa baseline?]
+* **Inductive Bias:**  
+  1. **Axis-Aligned Partitioning Bias:** Model mempartisi ruang fitur menggunakan bidang potong yang tegak lurus terhadap sumbu koordinat masing-masing fitur ($x_j < \theta$), membentuk region hiper-persegi panjang (*hyper-rectangles*) dengan nilai prediksi konstan pada tiap daun.
+  2. **Sequential Residual Correction & Simplicity Bias:** Model mengasumsikan bahwa kesalahan prediksi dapat dikurangi secara bertahap melalui kombinasi banyak pembelajar lemah (*weak learners*) yang dangkal, serta lebih menyukai struktur pohon dengan jumlah daun sedikit dan bobot daun kecil akibat penalti regularisasi $L_2$ ($\lambda$) dan $\gamma$.
 
-#### 6.2.3 Implementasi (Ringkas)  **[M]**
-```python
-# Contoh kode
-from sklearn.ensemble import RandomForestClassifier
+* **Keunggulan dan Kelemahan:**
+  * **Keunggulan:** Akurasi prediktif sangat tinggi pada data tabular heterogen; memiliki regularisasi bawaan ($\gamma$ dan $\lambda$) untuk menekan *overfitting*; mendukung komputasi paralel berbasis histogram pada GPU; serta menyediakan skor *feature importance* (*gain*) untuk interpretabilitas model.
+  * **Kelemahan:** Memiliki banyak *hyperparameter* yang sensitif dan memerlukan penyetelan cermat; tidak dapat melakukan ekstrapolasi nilai prediksi di luar rentang target yang pernah dilihat pada data latih; serta cenderung rentan *overfitting* pada dataset berukuran kecil apabila kedalaman pohon terlalu besar.
 
-model_advanced = RandomForestClassifier(
-    n_estimators=100,
-    max_depth=10,
-    random_state=42
-)
-model_advanced.fit(X_train, y_train)
-y_pred_advanced = model_advanced.predict(X_test)
-```
+---
 
-#### 6.2.4 Optimization: Hyperparameter Tuning  **[O]**
+#### 6.2.3 Konfigurasi Hyperparameter Awal dan Hasil Validation Set
 
-**Parameter yang digunakan:**
-```
-[Tuliskan parameter penting, contoh:]
-- n_estimators: 100
-- max_depth: 10
-- learning_rate: 0.1
-- min_samples_split: 2
-```
+Pelatihan awal dijalankan pada perangkat **GPU (`CUDA`)** dengan konfigurasi *hyperparameter* awal sebagai berikut:
+* `n_estimators = 100`
+* `learning_rate = 0.1`
+* `max_depth = 6`
+* `tree_method = 'hist'`
+* `device = 'cuda'`
+* `random_state = 42`
 
-**Hyperparameter Tuning (WAJIB minimal 1 metode sederhana):**
-- Metode: [Grid Search / Random Search / Bayesian Optimization]
-- Search space: [rentang parameter yang dicoba]
-- Skema validasi: [k-fold CV / validation set]
-- Best parameters: [...]
-- Skor validasi sebelum vs sesudah tuning: [...]
+Hasil evaluasi performa awal pada **Training Set** dan **Validation Set** (bukan *Test Set*) untuk ketiga dataset dirangkum pada tabel berikut:
 
-#### 6.2.5 Kontrol Overfitting  **[O]**
-[Jelaskan regularisasi/pembatasan kompleksitas yang dipakai, misal: max_depth, min_samples_leaf, early stopping pada boosting]
+| Dataset | Satuan Target | Train RMSE | Validation RMSE | Validation MAE | Validation $R^2$ | Waktu Latih (GPU) |
+|---|---|---|---|---|---|---|
+| **Dataset 1** (`yield_df.csv`) | hg/ha | 17.242,9707 | **19.492,5781** | **12.199,2451** | **0,9493** | 0,74 detik |
+| **Dataset 2** (`crop_yield.csv`) | ton/ha | 0,4984 | **0,5004** | **0,3993** | **0,9128** | 2,42 detik |
+| **Dataset 3** (`crop_yield_dataset.csv`) | ton/ha | 3,6973 | **5,3472** | **4,2781** | **0,9804** | 0,21 detik |
 
-#### 6.2.6 Hasil Model  **[O → P]**
+* **Analisis Awal Performa & Diagnostik Model:**
+  1. **Daya Jelajah Varians Tinggi:** Pada konfigurasi awal sebelum *tuning*, XGBoost Regressor sudah mampu menjelaskan **94,93%** varians hasil panen pada Dataset 1, **91,28%** pada Dataset 2, dan **98,04%** pada Dataset 3.
+  2. **Efisiensi Komputasi GPU:** Seluruh proses pelatihan selesai dalam waktu sangat singkat (**0,74 detik** untuk Dataset 1, **2,42 detik** untuk ~700.000 baris Dataset 2, dan **0,21 detik** untuk Dataset 3).
+  3. **Indikasi Generalisasi:** Pada Dataset 2, selisih antara *Train RMSE* (`0,4984`) dan *Validation RMSE* (`0,5004`) sangat tipis sehingga tidak terjadi *overfitting*. Sementara pada Dataset 1 dan Dataset 3 terdapat selisih moderat antara skor latih dan validasi yang menjadi dasar pertimbangan penyetelan regularisasi dan *learning rate* pada tahap *Hyperparameter Tuning* (Bab 7).
+  4. **Interpretasi Fitur Dominan (Dataset 1):** Berdasarkan analisis *feature importance* (*gain*), prediktor paling berpengaruh pada Dataset 1 didominasi oleh jenis komoditas berproduktivitas tinggi (`Item_Potatoes`, `Item_Cassava`, `Item_Sweet potatoes`, `Item_Yams`, dan `Item_Plantains and others`), diikuti oleh faktor wilayah (`Area_India`, `Area_United Kingdom`, `Area_Japan`) serta input pertanian dan iklim (`pesticides_tonnes` dan `avg_temp`). Temuan ini selaras dengan hasil eksplorasi data pada Bab 4.4.
+  5. Visualisasi Diagnostik Model XGBoost (Dataset 1)
+    ![Top 10 Feature Importance XGBoost](./eda_plots/adv_1_feature_importance.png)
+    ![Actual vs Predicted Yield XGBoost](./eda_plots/adv_2_actual_vs_predicted.png)
 
-**[Tuliskan hasil pada validation set; evaluasi akhir dijelaskan di Bab 7]**
+* **Interpretasi Grafik:**  
+  Grafik *feature importance* mengonfirmasi bahwa jenis komoditas umbi-umbian (`Item_Potatoes`, `Item_Cassava`, `Item_Sweet potatoes`) memberikan kontribusi pemisahan (*gain*) terbesar dibandingkan fitur lainnya. Sementara itu, sebaran titik pada plot *Actual vs Predicted* mengikuti garis diagonal identitas secara rapat dari rentang hasil panen rendah hingga tinggi, menunjukkan akurasi prediksi yang konsisten pada *Validation Set*.
 
 ---
 
