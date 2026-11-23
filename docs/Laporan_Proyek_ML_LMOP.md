@@ -381,43 +381,142 @@ Teknik *data balancing* (seperti *oversampling* SMOTE atau *undersampling*) **ti
 
 #### 6.1.1 Deskripsi Model  **[M]**
 
-**Nama Model:** [Nama model, misal: Logistic Regression]  
-**Teori Singkat:**  
-[Jelaskan secara singkat bagaimana model ini bekerja]  
-**Alasan Pemilihan:**  
-[Mengapa memilih model ini sebagai baseline?]
+**Nama Model:** Linear Regression
+
+**Teori Singkat:**
+
+Linear Regression merupakan algoritma supervised learning yang digunakan untuk memprediksi nilai numerik berdasarkan hubungan linear antara variabel input dan variabel target. Model ini menghasilkan prediksi melalui kombinasi bobot setiap fitur dan sebuah konstanta (intercept).
+
+Secara matematis, model Linear Regression dirumuskan sebagai:
+
+ŷ = β0 + β1x1 + β2x2 + ... + βnxn
+
+Model dilatih menggunakan metode Ordinary Least Squares (OLS), yaitu dengan mencari koefisien yang meminimalkan jumlah kuadrat selisih antara nilai aktual dan nilai prediksi.
+
+**Alasan Pemilihan:**
+
+Linear Regression dipilih sebagai model baseline karena memiliki struktur sederhana, mudah diimplementasikan, dan relatif cepat dalam proses pelatihan. Selain itu, model ini dapat menjadi pembanding awal untuk mengukur peningkatan performa yang diperoleh dari model Advanced, yaitu XGBoost Regressor.
 
 #### 6.1.2 Hypothesis Space & Inductive Bias  **[M]**
 
-- **Model family / arsitektur:** [misal: model linear]
-- **Hypothesis space:** [himpunan fungsi yang dapat direpresentasikan, misal: batas keputusan linear]
-- **Inductive bias / asumsi:** [misal: hubungan fitur-target linear, fitur independen]
-- **Implikasi terhadap dataset Anda:** [apakah asumsi cocok dengan data?]
+- **Model Family / Arsitektur:** Model linear parametrik dengan satu fungsi prediksi linear.
+
+- **Hypothesis Space:** Kumpulan fungsi linear yang merepresentasikan hubungan antara variabel input dengan produktivitas hasil panen melalui kombinasi koefisien setiap fitur dan intercept.
+
+- **Inductive Bias / Asumsi:** Model mengasumsikan bahwa hubungan antara fitur input dan target dapat didekati menggunakan kombinasi linear. Setiap fitur memberikan kontribusi berdasarkan koefisien yang dipelajari selama proses training.
+
+- **Implikasi terhadap Dataset:** Linear Regression dapat memberikan gambaran awal mengenai hubungan fitur pertanian dan produktivitas hasil panen. Namun, model memiliki keterbatasan dalam menangkap hubungan non-linear, interaksi kompleks, serta kondisi ambang batas pada faktor agroklimat. Oleh karena itu, model ini digunakan sebagai baseline untuk dibandingkan dengan XGBoost Regressor.
 
 #### 6.1.3 Implementasi (Ringkas)  **[M]**
-```python
-# Contoh kode (opsional, bisa dipindah ke GitHub)
-from sklearn.linear_model import LogisticRegression
+**Framework:** Python dengan Scikit-learn.
 
-model_baseline = LogisticRegression(C=1.0, max_iter=100)
-model_baseline.fit(X_train, y_train)
-y_pred_baseline = model_baseline.predict(X_test)
+Implementasi model Baseline menggunakan algoritma **Linear Regression** dari library `sklearn.linear_model`. Model dilatih secara terpisah menggunakan tiga dataset yang telah melalui tahap Data Preparation.
+
+Proses pelatihan menggunakan data training (`X_train` dan `y_train`) yang sebelumnya telah melalui proses encoding dan scaling. Setelah proses training selesai, model digunakan untuk menghasilkan prediksi pada data training dan validation.
+
+Implementasi dilakukan menggunakan konfigurasi hyperparameter yang sama pada ketiga dataset agar hasil eksperimen dapat dibandingkan secara konsisten.
+
+**Kode Implementasi:**
+
+```python
+from sklearn.linear_model import LinearRegression
+
+# Konfigurasi model Baseline
+baseline_params = {
+    'fit_intercept': True
+}
+
+# Menyiapkan ketiga dataset
+datasets_splits = {
+    'Dataset 1': dataset_1,
+    'Dataset 2': dataset_2,
+    'Dataset 3': dataset_3
+}
+
+# Training model
+baseline_models = {}
+
+for nama, split in datasets_splits.items():
+
+    model = LinearRegression(**baseline_params)
+
+    model.fit(
+        split['X_train'],
+        split['y_train']
+    )
+
+    baseline_models[nama] = model
 ```
+
+Implementasi menghasilkan tiga model Linear Regression yang disimpan secara terpisah, yaitu untuk Crop Yield Prediction Dataset, Agriculture Crop Yield Dataset, dan Smart Crop Yield Prediction Dataset.
+
+---
 
 #### 6.1.4 Optimization: Objective, Hyperparameter & Regularisasi  **[O]**
 
-**Objective/loss yang dioptimalkan:** [misal: log-loss + L2]  
-**Parameter yang digunakan:**
-```
-[Tuliskan parameter penting, contoh:]
-- C (regularization): 1.0
-- solver: 'lbfgs'
-- max_iter: 100
-```
+**Objective/Loss yang Dioptimalkan:**
+
+Linear Regression menggunakan metode *Ordinary Least Squares* (OLS) untuk mencari koefisien regresi yang meminimalkan jumlah kuadrat selisih antara nilai aktual dan nilai prediksi.
+
+Secara matematis, fungsi objektif dirumuskan sebagai:
+
+$$\[
+MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2
+\]$$
+
+Tujuannya adalah memperoleh koefisien regresi yang menghasilkan kesalahan prediksi sekecil mungkin.
+
+**Parameter yang Digunakan:**
+
+| Parameter | Nilai | Keterangan |
+|---|---|---|
+| `fit_intercept` | True | Menggunakan konstanta (intercept) dalam persamaan regresi. |
+| `copy_X` | True (default) | Menyalin data input sebelum proses fitting. |
+| `positive` | False (default) | Tidak membatasi koefisien regresi agar selalu bernilai positif. |
+
+Konfigurasi tersebut diterapkan secara konsisten pada ketiga dataset dengan menggunakan parameter awal yang sama.
+
+**Regularisasi:**
+
+Model Linear Regression standar tidak menerapkan regularisasi L1 maupun L2. Hal ini dilakukan agar model tetap sederhana dan dapat digunakan sebagai pembanding awal terhadap model Advanced XGBoost Regressor.
+
+Tidak dilakukan hyperparameter tuning khusus pada model Baseline karena eksperimen ini berfokus pada pengukuran performa awal Linear Regression menggunakan konfigurasi standar.
+
+---
 
 #### 6.1.5 Hasil Awal  **[O → P]**
 
-**[Tuliskan hasil awal pada validation set; evaluasi akhir pada test set dijelaskan di Bab 7]**
+Pelatihan model Linear Regression dilakukan pada ketiga dataset menggunakan konfigurasi hyperparameter awal yang sama. Evaluasi dilakukan pada Training Set dan Validation Set menggunakan metrik Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), dan R-squared (R²).
+
+**Hasil Evaluasi Model Baseline:**
+
+| Dataset | Train RMSE | Validation RMSE | Validation MAE | Validation R² | Training Time |
+|---|---:|---:|---:|---:|---:|
+| Dataset 1 | 41.750,6430 | 43.524,4545 | 30.270,2684 | 0,7472 | 1,89 detik |
+| Dataset 2 | 0,5001 | 0,4999 | 0,3989 | 0,9130 | 1,55 detik |
+| Dataset 3 | 5,0015 | 5,0935 | 4,0599 | 0,9822 | 0,01 detik |
+
+**Analisis Hasil Awal:**
+
+1. **Dataset 1 – Crop Yield Prediction Dataset**
+
+   Linear Regression memperoleh nilai Validation RMSE sebesar 43.524,4545 hg/ha, MAE sebesar 30.270,2684 hg/ha, dan R² sebesar 0,7472. Hasil ini menunjukkan bahwa model mampu menjelaskan sekitar 74,72% variasi produktivitas hasil panen pada data validation. Nilai kesalahan pada validation set lebih tinggi dibandingkan training set, yang menunjukkan adanya peningkatan kesalahan prediksi pada data yang tidak digunakan dalam pelatihan.
+
+2. **Dataset 2 – Agriculture Crop Yield Dataset**
+
+   Model memperoleh Validation RMSE sebesar 0,4999 ton/ha, MAE sebesar 0,3989 ton/ha, dan R² sebesar 0,9130. Nilai R² menunjukkan bahwa model mampu menjelaskan sekitar 91,30% variasi produktivitas hasil panen. Perbedaan antara Train RMSE dan Validation RMSE sangat kecil sehingga performa model relatif konsisten pada kedua bagian data.
+
+3. **Dataset 3 – Smart Crop Yield Prediction Dataset**
+
+   Model memperoleh Validation RMSE sebesar 5,0935 ton/ha, MAE sebesar 4,0599 ton/ha, dan R² sebesar 0,9822. Hasil ini menunjukkan bahwa model mampu menjelaskan sekitar 98,22% variasi produktivitas hasil panen pada data validation. Nilai kesalahan training dan validation relatif berdekatan sehingga menunjukkan performa yang cukup konsisten.
+
+**Kesimpulan Awal:**
+
+Berdasarkan hasil eksperimen, Linear Regression berhasil digunakan sebagai model Baseline pada ketiga dataset dengan performa yang berbeda-beda. Dataset 1 menunjukkan nilai kesalahan prediksi yang relatif lebih tinggi dan nilai R² yang lebih rendah dibandingkan Dataset 2 dan Dataset 3.
+
+Perbedaan tersebut menunjukkan bahwa kemampuan model linear dalam memperkirakan produktivitas hasil panen dipengaruhi oleh karakteristik masing-masing dataset.
+
+Hasil eksperimen Baseline ini selanjutnya digunakan sebagai dasar perbandingan dengan model Advanced XGBoost Regressor pada validation set untuk mengetahui perbedaan performa kedua pendekatan.
 
 ---
 
