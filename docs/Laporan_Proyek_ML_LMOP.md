@@ -585,6 +585,27 @@ Hasil evaluasi performa awal pada **Training Set** dan **Validation Set** (bukan
 * **Interpretasi Grafik:**  
   Grafik *feature importance* mengonfirmasi bahwa jenis komoditas umbi-umbian (`Item_Potatoes`, `Item_Cassava`, `Item_Sweet potatoes`) memberikan kontribusi pemisahan (*gain*) terbesar dibandingkan fitur lainnya. Sementara itu, sebaran titik pada plot *Actual vs Predicted* mengikuti garis diagonal identitas secara rapat dari rentang hasil panen rendah hingga tinggi, menunjukkan akurasi prediksi yang konsisten pada *Validation Set*.
 
+#### 6.2.4 Perbandingan Awal Model Baseline vs. Advanced (Validation Set)
+
+Perbandingan performa awal antara **Model 1 (Baseline: Linear Regression)** dan **Model 2 (Advanced: XGBoost Regressor)** pada *Validation Set* untuk ketiga dataset dirangkum pada tabel berikut:
+
+| Dataset | Metrik Evaluasi | Baseline (Linear Regression) | Advanced (XGBoost Initial) | Selisih / Perubahan |
+|---|---|---|---|---|
+| **Dataset 1** (`yield_df.csv`) | **Val RMSE** (hg/ha) | 43.524,4545 | **19.492,5781** | **-55,21%** (Membaik) |
+| | **Val MAE** (hg/ha) | 30.270,2684 | **12.199,2451** | **-59,70%** (Membaik) |
+| | **Val $R^2$** | 0,7472 | **0,9493** | **+0,2021** (Membaik) |
+| **Dataset 2** (`crop_yield.csv`) | **Val RMSE** (ton/ha) | **0,4999** | 0,5004 | +0,10% (Setara) |
+| | **Val MAE** (ton/ha) | **0,3989** | 0,3993 | +0,10% (Setara) |
+| | **Val $R^2$** | **0,9130** | 0,9128 | -0,0002 (Setara) |
+| **Dataset 3** (`crop_yield_dataset.csv`) | **Val RMSE** (ton/ha) | **5,0935** | 5,3472 | +4,98% |
+| | **Val MAE** (ton/ha) | **4,0599** | 4,2781 | +5,37% |
+| | **Val $R^2$** | **0,9822** | 0,9804 | -0,0018 |
+
+* **Analisis Perbandingan Awal:**
+  1. **Keunggulan Signifikan XGBoost pada Data Riil Non-Linear (Dataset 1):** Pada data historis FAOSTAT (`yield_df.csv`), XGBoost menurunkan *Validation RMSE* sebesar **55,21%** (dari `43.524,45` menjadi `19.492,58` hg/ha) dan meningkatkan $R^2$ dari **0,7472** menjadi **0,9493**. Hal ini membuktikan bahwa hubungan antarvariabel agroklimat dan hasil panen pada dunia nyata bersifat sangat non-linear sehingga gagal ditangkap oleh *hyperplane* *Linear Regression* (*underfitting*).
+  2. **Kesesuaian Inductive Bias pada Dataset 2 dan Dataset 3:** Pada Dataset 2 dan Dataset 3, *Linear Regression* menghasilkan skor validasi yang sangat kompetitif ($R^2 = 0,9130$ dan $0,9822$), bahkan sedikit lebih baik dibandingkan XGBoost sebelum *tuning* ($R^2 = 0,9128$ dan $0,9804$). Pola ini mengindikasikan bahwa struktur hubungan fitur-target pada kedua dataset tersebut cenderung aditif dan mendekati linear, sedangkan pohon keputusan XGBoost dengan kedalaman awal (`max_depth=6`) sedikit menangkap *noise* pada Dataset 3 (*Train RMSE* `3,6973` vs *Val RMSE* `5,3472`).
+  3. **Arah Pengembangan Minggu 4:** Hasil perbandingan ini menjadi landasan kuat untuk melakukan *Hyperparameter Tuning* (pengaturan regularisasi `reg_alpha`, `reg_lambda`, `max_depth`, dan `learning_rate`) guna menekan *overfitting* XGBoost pada Dataset 3 sekaligus menguji arsitektur *Deep Learning* (MLP) sebagai pembanding ketiga.
+
 ---
 
 ### 6.3 Model 3 — Deep Learning Model (WAJIB)
