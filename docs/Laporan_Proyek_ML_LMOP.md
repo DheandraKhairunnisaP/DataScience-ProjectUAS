@@ -616,10 +616,11 @@ Hasil evaluasi performa awal pada **Training Set** dan **Validation Set** (bukan
 
 #### 6.3.1 Deskripsi Model  **[M]**
 
-**Nama Model:** [Nama arsitektur, misal: CNN / LSTM / MLP]
+**Nama Model:** Multilayer Perceptron (MLP) Regressor
 
-** (Centang) Jenis Deep Learning: **
-- [ ] Multilayer Perceptron (MLP) - untuk tabular
+**Jenis Deep Learning:**
+
+- [x] Multilayer Perceptron (MLP) - untuk tabular
 - [ ] Convolutional Neural Network (CNN) - untuk image
 - [ ] Recurrent Neural Network (LSTM/GRU) - untuk sequential/text
 - [ ] Transfer Learning - untuk image
@@ -628,32 +629,67 @@ Hasil evaluasi performa awal pada **Training Set** dan **Validation Set** (bukan
 - [ ] Neural Collaborative Filtering - untuk recommender
 
 **Alasan Pemilihan:**  
-[Mengapa arsitektur ini cocok untuk dataset Anda?]
+Multilayer Perceptron (MLP) dipilih sebagai model Deep Learning karena ketiga dataset yang digunakan dalam proyek ini memiliki struktur data tabular yang berisi kombinasi fitur numerik dan kategorikal. Setelah melalui tahap data preparation, seluruh fitur telah diubah ke dalam bentuk numerik menggunakan StandardScaler dan OneHotEncoder sehingga dapat diproses oleh jaringan saraf tiruan.
+
+MLP memiliki beberapa lapisan neuron yang saling terhubung dan mampu mempelajari hubungan antara fitur masukan dengan variabel target. Arsitektur ini sesuai dengan karakteristik data penelitian yang melibatkan berbagai faktor, seperti curah hujan, suhu, jenis tanaman, wilayah, karakteristik tanah, serta penggunaan input pertanian.
+
+Penggunaan dua hidden layer dengan fungsi aktivasi ReLU dirancang agar model dapat mempelajari pola hubungan non-linear antarfitur. Selain itu, teknik Dropout dan Batch Normalization digunakan untuk membantu mengontrol proses training, menjaga kestabilan aktivasi, serta mengurangi risiko overfitting.
+
+MLP diterapkan secara terpisah pada masing-masing dataset karena setiap dataset memiliki jumlah fitur dan karakteristik variabel target yang berbeda. Dengan demikian, rancangan dasar arsitektur tetap sama, sedangkan dimensi input disesuaikan dengan hasil preprocessing masing-masing dataset.
+
 
 #### 6.3.2 Arsitektur Model, Hypothesis Space & Inductive Bias  **[M]**
 
-**Inductive bias arsitektur:** [misal: CNN → lokalitas & translation invariance; LSTM → ketergantungan sekuensial; MLP → tanpa asumsi struktur]  
-**Hypothesis space:** [kapasitas model: jumlah layer, unit, parameter]
+**Inductive Bias Arsitektur:**
 
-**Deskripsi Layer:**
+MLP menggunakan pendekatan *fully connected neural network*, yaitu setiap neuron pada suatu layer terhubung dengan neuron pada layer berikutnya. Berbeda dengan CNN yang memiliki asumsi lokalitas pada data citra atau LSTM yang dirancang untuk mempelajari ketergantungan sekuensial, MLP tidak memiliki asumsi khusus mengenai struktur spasial maupun urutan waktu pada data.
 
-[Jelaskan arsitektur secara detail atau buat tabel]
+Inductive bias yang digunakan dalam arsitektur MLP meliputi:
 
-**Contoh:**
-```
-1. Input Layer: shape (224, 224, 3)
-2. Conv2D: 32 filters, kernel (3,3), activation='relu'
-3. MaxPooling2D: pool size (2,2)
-4. Conv2D: 64 filters, kernel (3,3), activation='relu'
-5. MaxPooling2D: pool size (2,2)
-6. Flatten
-7. Dense: 128 units, activation='relu'
-8. Dropout: 0.5
-9. Dense: 10 units, activation='softmax'
+1. **Fully Connected Structure:** Setiap fitur masukan dapat berkontribusi terhadap pembentukan representasi pada hidden layer melalui kombinasi bobot yang dipelajari selama training.
 
-Total parameters: [jumlah]
-Trainable parameters: [jumlah]
-```
+2. **Non-linear Representation:** Penggunaan fungsi aktivasi ReLU memungkinkan model mempelajari hubungan non-linear antara faktor agroklimat dan produktivitas hasil panen.
+
+3. **Layered Representation:** Penggunaan dua hidden layer memungkinkan model mempelajari kombinasi fitur secara bertahap, mulai dari representasi awal hingga representasi yang lebih kompleks sebelum menghasilkan prediksi.
+
+4. **Regularization:** Dropout dengan nilai 0,3 digunakan untuk menonaktifkan sebagian neuron secara acak selama training sehingga mengurangi ketergantungan berlebihan antar-neuron. Batch Normalization diterapkan untuk menstabilkan distribusi aktivasi dan membantu proses training.
+
+**Hypothesis Space:**
+
+Ruang hipotesis MLP merupakan kumpulan fungsi pemetaan non-linear yang dibentuk melalui kombinasi bobot (*weights*), bias, fungsi aktivasi, dan parameter pada setiap layer jaringan saraf.
+
+Arsitektur yang dirancang menggunakan dua hidden layer dengan masing-masing 128 dan 64 unit neuron, serta satu output layer yang terdiri dari satu neuron untuk menghasilkan prediksi nilai produktivitas hasil panen.
+
+Secara umum, fungsi pemetaan model dapat direpresentasikan sebagai berikut:
+
+$$\[
+\hat{y} = W_3 h_2 + b_3
+\]$$
+
+dengan:
+
+- $$\(h_2\)$$ merupakan representasi keluaran hidden layer kedua.
+- $$\(W_3\)$$ merupakan bobot pada output layer.
+- $$\(b_3\)$$ merupakan bias pada output layer.
+- $$\(\hat{y}\)$$ merupakan hasil prediksi produktivitas panen.
+
+**Deskripsi Arsitektur Layer:**
+
+Arsitektur MLP dirancang dengan dua hidden layer dan satu output layer. Urutan layer yang digunakan adalah sebagai berikut:
+
+| No. | Layer | Konfigurasi | Fungsi |
+|---|---|---|---|
+| 1 | Input Layer | 116 / 27 / 28 fitur | Menerima data masukan sesuai dataset |
+| 2 | Dense Layer 1 | 128 units | Mempelajari kombinasi awal fitur |
+| 3 | Batch Normalization | 128 units | Menstabilkan distribusi aktivasi |
+| 4 | ReLU | Activation | Memperkenalkan hubungan non-linear |
+| 5 | Dropout | 0,3 | Mengurangi risiko overfitting |
+| 6 | Dense Layer 2 | 64 units | Mempelajari representasi fitur lanjutan |
+| 7 | Batch Normalization | 64 units | Menstabilkan distribusi aktivasi |
+| 8 | ReLU | Activation | Memperkenalkan hubungan non-linear |
+| 9 | Dropout | 0,3 | Mengurangi risiko overfitting |
+| 10 | Output Layer | 1 unit, Linear | Menghasilkan prediksi nilai hasil panen |
+
 
 #### 6.3.3 Input & Preprocessing Khusus  **[M]**
 
