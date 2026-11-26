@@ -75,7 +75,7 @@ Ide proyek **berasal dari mahasiswa** dan harus selaras dengan **salah satu** da
 **Sumber ide:** Pengamatan langsung terhadap fenomena kemarau berkepanjangan dan anomali musim hujan di wilayah sentra pertanian Jawa Timur yang mengakibatkan fluktuasi hasil panen padi dan jagung serta kesulitan petani lokal dalam menentukan waktu tanam optimal.
 
 ### 2.3 Ringkasan Alur Lifecycle Proyek
-Proyek ini mengimplementasikan siklus L-M-O-P secara bertahap, dimulai dari tahap Learning Problem melalui perumusan target regresi hasil panen (hg/ha) serta kurasi dataset agroklimat FAOSTAT. Pada tahap Model Design, dirancang tiga model dengan variasi kapasitas yaitu Linear Regression, Random Forest Regressor, dan Multilayer Perceptron. Tahap Optimization memfokuskan pelatihan model melalui penyesuaian fungsi loss MSE, tuning hyperparameter berbasis validasi, serta penerapan regularisasi Dropout untuk mereduksi overfitting pada neural network. Pada tahap Predict and Evaluate, evaluasi akhir dilakukan pada test set independen menggunakan metrik RMSE, MAE, dan R-squared, yang hasilnya menjadi dasar iterasi umpan balik untuk rekayasa fitur dan penyempurnaan kapasitas arsitektur model.
+Proyek ini mengimplementasikan siklus L-M-O-P secara bertahap, dimulai dari tahap Learning Problem melalui perumusan target regresi hasil panen (hg/ha) serta kurasi dataset agroklimat FAOSTAT. Pada tahap Model Design, dirancang tiga model dengan variasi kapasitas yaitu Linear Regression, XGBoost Regressor, dan Multilayer Perceptron. Tahap Optimization memfokuskan pelatihan model melalui penyesuaian fungsi loss MSE, tuning hyperparameter berbasis validasi, serta penerapan regularisasi Dropout untuk mereduksi overfitting pada neural network. Pada tahap Predict and Evaluate, evaluasi akhir dilakukan pada test set independen menggunakan metrik RMSE, MAE, dan R-squared, yang hasilnya menjadi dasar iterasi umpan balik untuk rekayasa fitur dan penyempurnaan kapasitas arsitektur model.
 
 ---
 
@@ -98,7 +98,7 @@ Rumuskan masalah dalam kerangka *Learning Problem*:
 
 ### 3.3 Goals
 1. Membangun model regresi machine learning untuk memprediksi hasil panen tanaman pangan dengan mencapai koefisien determinasi R² lebih besar dari 0.75 pada data uji.
-2. Mengukur dan membandingkan performa tiga pendekatan model yaitu Linear Regression (baseline), Random Forest Regressor (advanced), dan Multilayer Perceptron (deep learning) secara terukur menggunakan metrik RMSE dan MAE.
+2. Mengukur dan membandingkan performa tiga pendekatan model yaitu Linear Regression (baseline), XGBoost Regressor (advanced), dan Multilayer Perceptron (deep learning) secara terukur menggunakan metrik RMSE dan MAE.
 3. Mengidentifikasi variabel cuaca dan agronomi yang paling berpengaruh terhadap fluktuasi hasil panen guna mendukung pencapaian target SDG 2.4 terkait pertanian tangguh iklim.
 4. Menghasilkan pipeline eksperimen machine learning yang reproducible dengan struktur repositori kode yang modular dan terdokumentasi rapi.
 
@@ -110,7 +110,7 @@ Mahasiswa **WAJIB** menggunakan minimal **tiga model** dengan komposisi sebagai 
 Model Linear Regression dipilih sebagai model baseline. Model ini bekerja dengan mengasumsikan adanya hubungan linear tertimbang antara fitur masukan (curah hujan, suhu, input pestisida) terhadap target hasil panen. Pemilihan ini bertujuan untuk menetapkan batas bawah performa (benchmark) guna membuktikan apakah hubungan dalam sistem agroklimat dapat dijelaskan oleh model linear sederhana atau membutuhkan pemetaan fungsi yang lebih fleksibel.
 
 #### **Model 2 – Advanced / ML Model**
-Model Random Forest Regressor (atau XGBoost Regressor) dipilih sebagai model advanced machine learning. Algoritma ini bekerja berbasis ensemble pohon keputusan yang menggabungkan prediksi dari ratusan decision tree melalui mekanisme bootstrap aggregating. Alasan pemilihannya adalah kemampuannya dalam menangkap interaksi non linear, batas ambang cuaca ekstrem (misalnya batas toleransi suhu tanaman), serta ketahanannya terhadap korelasi antarfitur tanpa membutuhkan asumsi normalitas data.
+Model XGBoost Regressor (atau XGBoost Regressor) dipilih sebagai model advanced machine learning. Algoritma ini bekerja berbasis ensemble pohon keputusan yang menggabungkan prediksi dari ratusan decision tree melalui mekanisme bootstrap aggregating. Alasan pemilihannya adalah kemampuannya dalam menangkap interaksi non linear, batas ambang cuaca ekstrem (misalnya batas toleransi suhu tanaman), serta ketahanannya terhadap korelasi antarfitur tanpa membutuhkan asumsi normalitas data.
 
 #### **Model 3 – Deep Learning Model (WAJIB)**
 
@@ -587,28 +587,66 @@ Hasil evaluasi performa awal pada **Training Set** dan **Validation Set** (bukan
 
 #### 6.2.4 Optimization: Hyperparameter Tuning  **[O]**
 
-**Parameter yang digunakan:**
-```
-[Tuliskan parameter penting, contoh:]
-- n_estimators: 100
-- max_depth: 10
-- learning_rate: 0.1
-- min_samples_split: 2
-```
+**Parameter yang digunakan (Baseline Awal):**
+* `n_estimators`: 100
+* `learning_rate`: 0.1
+* `max_depth`: 6
+* `tree_method`: `'hist'`
+* `device`: `'cuda'`
+* `random_state`: 42
 
-**Hyperparameter Tuning (WAJIB minimal 1 metode sederhana):**
-- Metode: [Grid Search / Random Search / Bayesian Optimization]
-- Search space: [rentang parameter yang dicoba]
-- Skema validasi: [k-fold CV / validation set]
-- Best parameters: [...]
-- Skor validasi sebelum vs sesudah tuning: [...]
+**Hyperparameter Tuning:**
+* **Metode:** `RandomizedSearchCV` (`n_iter = 12`, total 36 *fits* per dataset) dengan metrik evaluasi `neg_root_mean_squared_error` dan akselerasi GPU (`cuda`).
+* **Search Space:**
+  * `n_estimators`: `[100, 200, 300, 500]`
+  * `learning_rate`: `[0.03, 0.05, 0.1, 0.15]`
+  * `max_depth`: `[4, 6, 8, 10]`
+  * `min_child_weight`: `[1, 3, 5, 10]`
+  * `gamma`: `[0, 0.1, 0.5, 1.0]`
+  * `subsample`: `[0.7, 0.8, 0.9, 1.0]`
+  * `colsample_bytree`: `[0.7, 0.8, 0.9, 1.0]`
+  * `reg_alpha`: `[0, 0.1, 1.0]`
+  * `reg_lambda`: `[1.0, 2.0, 5.0]`
+* **Skema Validasi:** *3-Fold Cross-Validation* (`CV_FOLDS = 3`, `shuffle = True`, `random_state = 42`) yang dijalankan eksklusif pada *Training Set* (`X_train`, `y_train`) untuk mencegah *data leakage* terhadap *Validation Set* maupun *Test Set*.
+* **Best Parameters per Dataset:**
+
+| Dataset | Best CV RMSE | Waktu Tuning | Kombinasi Hyperparameter Optimal |
+| :--- | :---: | :---: | :--- |
+| **Dataset 1** (`yield_df.csv`) | 12.039,2559 | 34,90 detik | `n_estimators`: 500, `learning_rate`: 0.15, `max_depth`: 10, `min_child_weight`: 3, `subsample`: 0.7, `colsample_bytree`: 0.9, `gamma`: 1.0, `reg_alpha`: 0, `reg_lambda`: 1.0 |
+| **Dataset 2** (`crop_yield.csv`) | 0,5007 | 129,44 detik | `n_estimators`: 200, `learning_rate`: 0.03, `max_depth`: 4, `min_child_weight`: 1, `subsample`: 1.0, `colsample_bytree`: 1.0, `gamma`: 0.1, `reg_alpha`: 1.0, `reg_lambda`: 5.0 |
+| **Dataset 3** (`crop_yield_dataset.csv`) | 5,1978 | 30,93 detik | `n_estimators`: 200, `learning_rate`: 0.03, `max_depth`: 4, `min_child_weight`: 1, `subsample`: 1.0, `colsample_bytree`: 1.0, `gamma`: 0.1, `reg_alpha`: 1.0, `reg_lambda`: 5.0 |
+
+* **Skor Validasi Sebelum vs Sesudah Tuning:**
+  * **Dataset 1:** *Validation RMSE* turun dari **19.492,5781** menjadi **10.737,0947** (membaik **44,92%**), diikuti peningkatan $R^2$ dari **0,9493** menjadi **0,9846**.
+  * **Dataset 2:** *Validation RMSE* turun tipis dari **0,5004** menjadi **0,5003** (membaik **0,02%**), dengan $R^2$ meningkat dari **0,9128** menjadi **0,9129**.
+  * **Dataset 3:** *Validation RMSE* turun dari **5,3472** menjadi **5,2411** (membaik **1,98%**), dengan $R^2$ meningkat dari **0,9804** menjadi **0,9811**.
+
+---
 
 #### 6.2.5 Kontrol Overfitting  **[O]**
-[Jelaskan regularisasi/pembatasan kompleksitas yang dipakai, misal: max_depth, min_samples_leaf, early stopping pada boosting]
+
+Untuk memastikan model tidak menghafal pola noise pada data latih, diterapkan empat mekanisme pengendalian kompleksitas selama pelatihan ulang model terbaik:
+
+1. **Pembatasan Struktur Pohon (`max_depth`, `min_child_weight`, `gamma`):** Membatasi kedalaman maksimum pohon (terutama `max_depth = 4` pada Dataset 2 dan 3), mensyaratkan bobot minimum instan pada setiap *child node* (`min_child_weight`), serta menetapkan ambang reduksi *loss* minimum (`gamma`) sebelum cabang baru dibentuk.
+2. **Subsampling Stokastik (`subsample` & `colsample_bytree`):** Pada Dataset 1 yang memiliki 116 dimensi fitur dan pohon yang dalam (`max_depth = 10`), penerapan `subsample = 0.7` (mengambil 70% sampel acak per pohon) dan `colsample_bytree = 0.9` (mengambil 90% fitur per pohon) mencegah pohon bergantung pada fitur atau sampel tertentu secara berlebihan.
+3. **Regularisasi Bobot Daun (`reg_alpha` & `reg_lambda`):** Penalti regularisasi L1 (`reg_alpha = 1.0`) dan L2 (`reg_lambda = 5.0`) pada Dataset 2 dan Dataset 3 menekan besarnya bobot prediksi pada setiap daun sehingga menghasilkan fungsi prediksi yang lebih halus dan stabil.
+4. **Early Stopping (`early_stopping_rounds = 30`):** Pelatihan iteratif dipantau menggunakan `eval_set = [(X_val, y_val)]` dan dihentikan otomatis apabila skor *Validation RMSE* tidak mengalami perbaikan selama 30 putaran berturut-turut, sehingga jumlah pohon efektif berhenti sebelum memasuki fase *overfitting*.
+
+---
 
 #### 6.2.6 Hasil Model  **[O → P]**
 
-**[Tuliskan hasil pada validation set; evaluasi akhir dijelaskan di Bab 7]**
+Perbandingan lengkap metrik performa sebelum dan sesudah *hyperparameter tuning* pada **Training Set** dan **Validation Set** (evaluasi akhir pada *Test Set* dibahas pada Bab 7) dirangkum pada tabel berikut:
+
+| Dataset | Satuan | Train RMSE (Before → After) | Val RMSE (Before → After) | Val MAE (Before → After) | Val $R^2$ (Before → After) | Penurunan Val RMSE |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Dataset 1** | hg/ha | 17.242,9707 → 3.079,7363 | 19.492,5781 → 10.737,0947 | 12.199,2451 → 5.230,5298 | 0,9493 → 0,9846 | **44,92%** |
+| **Dataset 2** | ton/ha | 0,4984 → 0,5001 | 0,5004 → 0,5003 | 0,3993 → 0,3992 | 0,9128 → 0,9129 | **0,02%** |
+| **Dataset 3** | ton/ha | 3,6973 → 4,7099 | 5,3472 → 5,2411 | 4,2781 → 4,2025 | 0,9804 → 0,9811 | **1,98%** |
+
+**Ringkasan Temuan Validation Set:**
+* **Peningkatan Akurasi Signifikan pada Pola Kompleks:** Dataset 1 mendapatkan manfaat terbesar dari kombinasi kapasitas pohon yang lebih dalam (`max_depth = 10`) dan *subsampling*, memangkas kesalahan prediksi *Validation RMSE* hampir setengahnya sebesar **44,92%** dan menurunkan rata-rata kesalahan absolut (*Val MAE*) dari **12.199,25** menjadi **5.230,53 hg/ha**.
+* **Generalisasi Stabil Tanpa Overfitting:** Pada Dataset 2, selisih antara *Train RMSE* (`0,5001`) dan *Validation RMSE* (`0,5003`) nyaris nol. Pada Dataset 3, regularisasi L1/L2 dan pohon dangkal (`max_depth = 4`) berhasil mempersempit *generalization gap* (*Train RMSE* naik dari `3,6973` ke `4,7099`, sementara *Validation RMSE* justru membaik dari `5,3472` ke `5,2411`), membuktikan kontrol *overfitting* berjalan efektif.
 
 ---
 
@@ -1145,7 +1183,7 @@ Referensi resmi: [Transforming our world: the 2030 Agenda for Sustainable Develo
 | Tugas ML (Target dan jenis tugas) | - Supervised Learning berupa Regresi (Regression) <br/> - Nilai estimasi hasil panen tanaman pangan (crop yield) per satuan luas lahan dengan satuan hektogram per hektar (hg/ha) berdasarkan variabel iklim, curah hujan, suhu, dan input agronomis |
 | Objective dan metrik utama | Model dioptimasi untuk meminimalkan fungsi kerugian Mean Squared Error atau Root Mean Squared Error, sedangkan performa akhir dievaluasi menggunakan metrik Root Mean Squared Error, Mean Absolute Error, dan nilai R-squared untuk mengukur persentase variansi hasil panen yang berhasil dijelaskan. |
 | Dataset (sumber, URL, ukuran, jenis data) | - [Kaggle Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset) <br/> - Ukuran: 28.242 baris data dan 7 kolom fitur (Area, Item, Year, hg/ha_yield, average_rain_fall_mm_per_year, pesticides_tonnes, avg_temp), ukuran file sekitar 1,2 MB <br/> - Jenis Data: Data tabular (CSV) <br/><br/>- [Agriculture Crop Yield Dataset](https://www.kaggle.com/datasets/samuelotiattakorah/agriculture-crop-yield) <br/> - Ukuran: 1.000.000 baris data dan 10 kolom fitur (mencakup curah hujan, temperatur, pupuk NPK, irigasi, dan hari tanam), ukuran file sekitar 78 MB <br/> - Jenis Data: Data tabular (CSV) <br/> <br/> - [Smart Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/miadul/smart-crop-yield-predication-dataset). <br/> - Ukuran: 1.000 baris data dan 10 kolom fitur (mencakup kelembapan udara, pH tanah, suhu lingkungan, dan takaran pupuk), ukuran file sekitar 75 KB <br/> - Jenis Data: Data tabular (CSV) |
-| Rencana tiga model (baseline / advanced / deep learning) | - Linear Regression sebagai pembanding dasar korelasi linear <br/><br/> - Random Forest Regressor atau XGBoost Regressor untuk menangkap pola non linear dan ambang batas anomali cuaca <br/><br/> - deep learning berupa Multilayer Perceptron minimal dua lapisan tersembunyi yang memanfaatkan fungsi aktivasi ReLU serta teknik regularisasi Dropout dan Batch Normalization. |
+| Rencana tiga model (baseline / advanced / deep learning) | - Linear Regression sebagai pembanding dasar korelasi linear <br/><br/> - XGBoost Regressor atau XGBoost Regressor untuk menangkap pola non linear dan ambang batas anomali cuaca <br/><br/> - deep learning berupa Multilayer Perceptron minimal dua lapisan tersembunyi yang memanfaatkan fungsi aktivasi ReLU serta teknik regularisasi Dropout dan Batch Normalization. |
 | Risiko dan pertimbangan etika (bias, privasi) | Risiko utama terletak pada potensi bias representasi wilayah akibat kelengkapan pencatatan stasiun cuaca yang timpang serta risiko kesalahan prediksi hasil panen yang dapat memengaruhi alokasi bantuan, sementara aspek privasi tetap aman karena data yang diolah merupakan agregat statistik makro tanpa informasi identitas pribadi. |
 | Referensi awal (minimal 2) | [Khaki, S., dan Wang, L. (2019). Crop yield prediction using deep neural networks. Frontiers in Plant Science, 10, 621.](https://doi.org/10.3389/fpls.2019.00621) <br/><br/> [Van Klompenburg, T., Kassahun, A., dan Catal, C. (2020). Crop yield prediction using machine learning: A systematic literature review. Computers and Electronics in Agriculture, 177, 105709.](https://doi.org/10.1016/j.compag.2020.105709) <br/><br/> [Goodfellow, I., Bengio, Y., dan Courville, A. (2016). Deep Learning. MIT Press.](http://repo.darmajaya.ac.id/4189/1/Deep%20learning_%20adaptive%20computation%20and%20machine%20learning%20%28%20PDFDrive%20%29.pdf) |
 
