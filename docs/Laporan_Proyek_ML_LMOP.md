@@ -729,90 +729,211 @@ Arsitektur MLP dirancang dengan dua hidden layer dan satu output layer. Urutan l
 | 10 | Output Layer | 1 unit, Linear | Menghasilkan prediksi nilai hasil panen |
 
 
-#### 6.3.3 Input & Preprocessing Khusus  **[M]**
+#### 6.3.3 Input & Preprocessing Khusus **[M]**
 
-**Input shape:** [Sebutkan dimensi input]  
+**Input shape:**
+- **Dataset 1:** `(116,)` (18.152 data train, 3.890 data validation)
+- **Dataset 2:** `(27,)` (699.838 data train, 149.965 data validation)
+- **Dataset 3:** `(28,)` (7.000 data train, 1.500 data validation)
+
 **Preprocessing khusus untuk DL:**
-- [Sebutkan preprocessing khusus seperti normalisasi, augmentasi, dll.]
+- **Konversi Tipe Data Tensor:** Mengonversi seluruh array fitur (`X_train`, `X_val`) dan target (`y_train`, `y_val`) ke format `np.float32` agar kompatibel dan optimal untuk akselerasi komputasi GPU di TensorFlow/Keras.
+- **Penyesuaian Dimensi Target:** Melakukan `reshape(-1)` pada variabel target `y` menjadi vektor 1 dimensi untuk kebutuhan regresi univariat (`Dense(1, activation='linear')`).
+- **Normalisasi & Encoding:** Fitur numerik telah melalui tahap standardisasi/scaling dan fitur kategorikal telah di-encode pada tahap *Data Preparation* (`02_data_preparation.ipynb`), sehingga distribusi input berada pada skala yang stabil sebelum masuk ke layer `BatchNormalization`.
+- **Augmentasi:** Tidak dilakukan augmentasi data karena karakteristik dataset berupa data tabular terstruktur.
 
-#### 6.3.4 Optimization: Konfigurasi Training  **[O]**
+---
+
+#### 6.3.4 Optimization: Konfigurasi Training **[O]**
 
 **Training Configuration:**
-```
-- Optimizer: Adam / SGD / RMSprop
-- Learning rate: [nilai]
-- Loss function: [categorical_crossentropy / mse / binary_crossentropy / etc.]
-- Metrics: [accuracy / mae / etc.]
-- Batch size: [nilai]
-- Epochs: [nilai]
-- Validation split: [nilai] atau menggunakan validation set terpisah
-- Callbacks: [EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, etc.]
-- Regularisasi: [Dropout / L2 / BatchNorm / augmentasi]
+```text
+- Optimizer: Adam
+- Learning rate: 0.001
+- Loss function: mse (Mean Squared Error)
+- Metrics: mae (Mean Absolute Error), disertai evaluasi tambahan RMSE dan R2
+- Batch size: 128 (Dataset 1), 2048 (Dataset 2), 64 (Dataset 3)
+- Epochs: 20 (tahap sanity check awal)
+- Validation split: Menggunakan validation set terpisah (validation_data=(X_val, y_val)) hasil splitting tahap preparasi
+- Callbacks: Belum diterapkan pada tahap sanity check awal (akan ditambahkan EarlyStopping & ReduceLROnPlateau pada tahap tuning)
+- Regularisasi: BatchNormalization dan Dropout(0.3) pada setiap hidden layer
 ```
 
 **Eksperimen optimasi (minimal 2 konfigurasi dibandingkan):**
 
-| Eksperimen | Learning Rate | Batch Size | Regularisasi | Val Loss | Val Metric |
-|------------|---------------|------------|--------------|----------|------------|
-| Exp-1 | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Exp-2 | [ ] | [ ] | [ ] | [ ] | [ ] |
+| Eksperimen | Dataset | Learning Rate | Batch Size | Regularisasi | Val Loss (MSE) | Val Metric (MAE / $R^2$) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Exp-1 (Sanity Check) | Dataset 1 | 0.001 | 128 | BatchNorm + Dropout(0.3) | 13293077504.0000 | MAE: 77506.1094 / $R^2$: -0.7737 |
+| Exp-1 (Sanity Check) | Dataset 2 | 0.001 | 2048 | BatchNorm + Dropout(0.3) | 0.2577 | MAE: 0.4052 / $R^2$: 0.9103 |
+| Exp-1 (Sanity Check) | Dataset 3 | 0.001 | 64 | BatchNorm + Dropout(0.3) | 49.2416 | MAE: 5.6860 / $R^2$: 0.9662 |
+| Exp-2 (Tuning DL) | [Dataset 1/2/3] | [ ] | [ ] | [ ] | [ ] | [ ] |
 
-#### 6.3.5 Implementasi (Ringkas)  **[M + O]**
+---
 
-**Framework:** TensorFlow/Keras / PyTorch
+#### 6.3.5 Implementasi (Ringkas) **[M + O]**
+
+**Framework:** TensorFlow/Keras (v2.21.0)
+
 ```python
-# Contoh kode TensorFlow/Keras
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 
-model_dl = keras.Sequential([
-    keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
-    keras.layers.Dropout(0.3),
-    keras.layers.Dense(64, activation='relu'),
-    keras.layers.Dropout(0.3),
-    keras.layers.Dense(num_classes, activation='softmax')
-])
+def build_mlp_regressor(input_dim):
+    model = keras.Sequential([
+        layers.Input(shape=(input_dim,), name='input_layer'),
+        layers.Dense(128, name='dense_1'),
+        layers.BatchNormalization(name='batch_normalization_1'),
+        layers.ReLU(name='relu_1'),
+        layers.Dropout(0.3, name='dropout_1'),
+        layers.Dense(64, name='dense_2'),
+        layers.BatchNormalization(name='batch_normalization_2'),
+        layers.ReLU(name='relu_2'),
+        layers.Dropout(0.3, name='dropout_2'),
+        layers.Dense(1, activation='linear', name='output_layer')
+    ], name=f'MLP_Regressor_{input_dim}D')
+    return model
 
-model_dl.compile(
-    optimizer='adam',
-    loss='categorical_crossentropy',
-    metrics=['accuracy']
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    loss='mse',
+    metrics=['mae']
 )
 
-history = model_dl.fit(
-    X_train, y_train,
-    validation_split=0.2,
-    epochs=50,
-    batch_size=32,
-    callbacks=[early_stopping]
+history = model.fit(
+    X_train,
+    y_train,
+    validation_data=(X_val, y_val),
+    epochs=20,
+    batch_size=batch_size,
+    verbose=1
 )
 ```
 
-#### 6.3.6 Training Process & Diagnosis Optimasi  **[O]**
+---
+
+#### 6.3.6 Training Process & Diagnosis Optimasi **[O]**
 
 **Training Time:**  
-[Sebutkan waktu training total, misal: 15 menit]
+Total waktu training awal untuk ketiga dataset adalah **78,75 detik (~1,31 menit)** dengan rincian:
+- **Dataset 1:** 21,42 detik (20 epochs)
+- **Dataset 2:** 40,58 detik (20 epochs)
+- **Dataset 3:** 16,75 detik (20 epochs)
 
 **Computational Resource:**  
-[CPU / GPU, platform: Local / Google Colab / Kaggle]
+GPU NVIDIA Tesla T4 (`/physical_device:GPU:0`), platform Google Colab.
 
 **Training History Visualization:**
 
-[Insert plot loss dan accuracy/metric per epoch]
-
-**Contoh visualisasi yang WAJIB:**
-1. **Training & Validation Loss** per epoch
-2. **Training & Validation Accuracy/Metric** per epoch
+![Training History Visualization - Loss dan MAE per Epoch](./eda_plots/dl_training_history.png)
 
 **Analisis Training:**
-- Apakah model mengalami overfitting? [Ya/Tidak, jelaskan]
-- Apakah model sudah converge? [Ya/Tidak, jelaskan]
-- Apakah perlu lebih banyak epoch? [Ya/Tidak, jelaskan]
-- Apakah learning rate sesuai (loss stabil/osilasi/lambat)? [Jelaskan]
+- **Apakah model mengalami overfitting?**  
+  **Tidak.** Pada tahap *sanity check* 20 epoch ini tidak ditemukan indikasi overfitting pada ketiga dataset. Pada Dataset 2, nilai `Train RMSE` (`0.5077`) identik dengan `Val RMSE` (`0.5077`). Pada Dataset 3, selisih antara `Train RMSE` (`6.7169`) dan `Val RMSE` (`7.0172`) sangat kecil. Sementara pada Dataset 1, model justru masih berada pada kondisi *underfitting* karena magnitudo nilai target yang besar belum di-scale.
+- **Apakah model sudah converge?**  
+  - **Dataset 2:** **Ya**, kurva `val_loss` turun drastis pada 4 epoch pertama dan mulai konvergen stabil sejak epoch ke-8 hingga epoch ke-20 pada kisaran `0.257–0.261` (`Val R2 = 0.9103`).
+  - **Dataset 3:** **Ya**, loss menurun tajam dari epoch 1 hingga 13 lalu mulai melandai (*plateau*) pada epoch 17–20 di kisaran `val_loss 48.4–49.2` (`Val R2 = 0.9662`).
+  - **Dataset 1:** **Belum**, kurva loss dan MAE masih terus menurun secara linear dari epoch 1 (`val_mae: 78541.96`) hingga epoch 20 (`val_mae: 77506.10`) tanpa tanda melandai.
+- **Apakah perlu lebih banyak epoch?**  
+  **Ya.** Dataset 1 membutuhkan jumlah epoch yang jauh lebih banyak (serta *target scaling* pada variabel `y`) agar bobot jaringan dapat mengejar skala target puluhan ribu. Dataset 3 juga masih berpotensi mendapat sedikit peningkatan performa dengan tambahan epoch yang dikontrol menggunakan `EarlyStopping`.
+- **Apakah learning rate sesuai (loss stabil/osilasi/lambat)?**  
+  Learning rate `0.001` dengan optimizer Adam sudah **sangat sesuai dan stabil** untuk Dataset 2 dan Dataset 3 karena menghasilkan penurunan loss yang mulus tanpa osilasi ekstrem. Namun, untuk Dataset 1, langkah pembaruan bobot dengan `lr = 0.001` terasa **terlalu lambat** dibandingkan skala nilai target (`MSE ~1.3e10`), sehingga diperlukan peningkatan learning rate atau normalisasi variabel target pada tahap optimasi berikutnya.
+
+---
 
 #### 6.3.7 Model Summary
+
+**1. Model Summary — Dataset 1 (`input_dim = 116`)**
+```text
+Model: "MLP_Regressor_116D"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense_1 (Dense)                 │ (None, 128)            │        14,976 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 128)            │           512 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_1 (ReLU)                   │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_1 (Dropout)             │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 64)             │         8,256 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 64)             │           256 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_2 (ReLU)                   │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_2 (Dropout)             │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ output_layer (Dense)            │ (None, 1)              │            65 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 24,065 (94.00 KB)
+ Trainable params: 23,681 (92.50 KB)
+ Non-trainable params: 384 (1.50 KB)
 ```
-[Paste model.summary() output atau rangkuman arsitektur]
+
+**2. Model Summary — Dataset 2 (`input_dim = 27`)**
+```text
+Model: "MLP_Regressor_27D"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense_1 (Dense)                 │ (None, 128)            │         3,584 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 128)            │           512 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_1 (ReLU)                   │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_1 (Dropout)             │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 64)             │         8,256 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 64)             │           256 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_2 (ReLU)                   │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_2 (Dropout)             │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ output_layer (Dense)            │ (None, 1)              │            65 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 12,673 (49.50 KB)
+ Trainable params: 12,289 (48.00 KB)
+ Non-trainable params: 384 (1.50 KB)
+```
+
+**3. Model Summary — Dataset 3 (`input_dim = 28`)**
+```text
+Model: "MLP_Regressor_28D"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense_1 (Dense)                 │ (None, 128)            │         3,712 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 128)            │           512 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_1 (ReLU)                   │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_1 (Dropout)             │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 64)             │         8,256 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 64)             │           256 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ relu_2 (ReLU)                   │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_2 (Dropout)             │ (None, 64)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ output_layer (Dense)            │ (None, 1)              │            65 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 12,801 (50.00 KB)
+ Trainable params: 12,417 (48.50 KB)
+ Non-trainable params: 384 (1.50 KB)
 ```
 
 ---
